@@ -208,5 +208,12 @@
     "title": "오믹스 데이터 분석 기술 Day 1",
     "section": "1) DEG",
     "text": "1) DEG\n\ndifferentially expressed genes; genes whose expression levels change significantly between different conditions (e.g., Case vs. Control)\n\n\n\n\n\n\n💡Not t-test!\n\ndoesn’t work for RNA-seq data"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "오믹스 데이터 분석 기술",
+    "section": "",
+    "text": "Course Overview"
   }
 ]
