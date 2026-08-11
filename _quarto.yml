@@ -1,9 +1,6 @@
 project:
   type: website
-  output-dir: docs
   execute-dir: project
-  resources:
-    - _extensions/ai-chat/ai-chat.js
 
 website:
   favicon: assets/img/favicon.ico
