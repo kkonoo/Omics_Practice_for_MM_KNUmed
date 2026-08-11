@@ -10,7 +10,7 @@ website:
   navbar:
     logo: assets/img/logo.jpg
     left:
-      - href: resources/index.qmd
+      - href: index.qmd
         text: Home
       - href: resources/Day1.qmd
         text: Day1
