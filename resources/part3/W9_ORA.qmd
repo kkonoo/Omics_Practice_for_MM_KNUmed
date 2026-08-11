@@ -1,0 +1,193 @@
+---
+title: "W9. Over-Representation Analysis (ORA)"
+author: "Eunji Ha"
+date: last-modified
+format:
+  html
+execute:
+  echo: true
+  eval: false
+---
+
+```{r setup, include=FALSE}
+# Install packages (run once)
+# if (!require("BiocManager")) install.packages("BiocManager")
+# BiocManager::install(c("clusterProfiler", "msigdbr", "enrichplot",
+#                        "org.Hs.eg.db", "AnnotationDbi", "DESeq2"))
+# install.packages(c("tidyverse", "ggrepel", "pheatmap", "ggridges"))
+```
+
+------------------------------------------------------------------------
+
+## 1. Introduction: Gene sets
+
+### after DEG analysis...
+
+From the last week, we identified \~5,500 DEGs (Tumor vs. Normal) with FDR≤0.05 & \|LFC\|≥1 ... ***So What?*** “Do they [**functionally cluster**]{.underline} in specific biological processes?“
+
+![](/assets/img/part3/W8_vol.png){fig-align="center" width="549"}
+
+Before running ORA, you need to understand the **databases** that link genes to biological pathways
+
+------------------------------------------------------------------------
+
+### Major Databases of gene sets
+
+| Database | Characteristics | Typical Use Case |
+|----|----|----|
+| [KEGG](https://www.genome.jp/kegg/) | Metabolic and disease pathways | Metabolic disease, signaling cascades |
+| [Gene Ontology(GO)](https://geneontology.org/) | Hierarchical gene function classification | Most widely used across all fields |
+| [Reactome](https://reactome.org/) | Peer-reviewed, manually curated pathways | Detailed biochemical mechanisms |
+| [MSigDB](https://www.gsea-msigdb.org/gsea/msigdb) / [**Enrichr**](https://maayanlab.cloud/Enrichr/#libraries) | 225+ diverse gene set collections | Exploratory analyses |
+
+![](/assets/img/part3/W9_ORA.png){fig-align="center" width="672"}
+
+------------------------------------------------------------------------
+
+### Three GO Categories
+
+-   **`BP (Biological Process)`**: What is the gene doing? (e.g., Cell division, Inflammation) ... *Most used in clinical research*
+-   `MF (Molecular Function)`: What is the molecular activity? (e.g., Kinase activity, ATP binding)
+-   `CC (Cellular Component)`: Where is it located? (e.g., Nucleus, Membrane)
+
+------------------------------------------------------------------------
+
+## 2. Statistical Principle: Fisher's Exact Test
+
+### Intuition: The Urn Problem
+
+> **Q:** Does my DEG list contain **more** genes from the "Inflammation" pathway **than expected by chance**?
+
+![](/assets/img/part3/W9_urn.png){fig-align="center"}
+
+### 2×2 Contingency Table
+
+|                  | **In Pathway (Red)** | **Not in Pathway (White)** | **Total**  |
+|------------------|:--------------------:|:--------------------------:|:----------:|
+| **DEGs (drawn)** |    100 *(a, hit)*    |         400 *(b)*          |    500     |
+| **Non-DEGs**     |      900 *(c)*       |        18,600 *(d)*        |   19,500   |
+| **Total**        |        1,000         |           19,000           | 20,000 (N) |
+
+### Two Effect Size Metrics
+
+**Odds Ratio (OR):** $$OR = \frac{a/c}{b/d} = \frac{a \times d}{b \times c} = \frac{100 \times 18{,}600}{400 \times 900} \approx 5.2$$
+
+**Fold Enrichment (FE)** — more intuitive and conservative: $$FE = \frac{a/(a+c)}{(a+b)/N} = \frac{\text{% of pathway genes among DEGs}}{\text{% of pathway genes in background}}$$
+
+::: callout-important
+## OR vs. FE — Which to Use?
+
+-   **OR**: Compares the two groups (selected vs. not selected); can overestimate effect size with small DEG lists
+-   **FE**: How much more enriched relative to the background; more commonly reported in papers
+-   **In practice**: Report both, but the **p-value (hypergeometric test)** and **FDR-corrected p-value** are the critical outputs
+:::
+
+------------------------------------------------------------------------
+
+### P-value: Hypergeometric Distribution
+
+|   | **In Pathway (Red)** | **Not in Pathway (White)** | **Total** |
+|----|:--:|:--:|:--:|
+| **DEGs (drawn)** | 100 ***(k)*** | 400 ***(n-k)*** | 500 **(n)** |
+| **Non-DEGs** | 900 *(K-k)* | 18,600 *(N-n -K-k)* | 19,500 (N-n) |
+| **Total** | 1,000 **(K)** | 19,000 **(N-K)** | 20,000 **(N)** |
+
+-   $N$: total number of genes (background)
+-   $K$: number of genes in the pathway
+-   $n$: number of DEGs
+-   $k$: number of DEGs that hit the pathway
+
+$$P(X = k) = \frac{\binom{K}{k}\binom{N-K}{n-k}}{\binom{N}{n}}$$
+
+$$\text{p-value} = \sum_{i=k}^{\min(n,K)} P(X=i) \quad \text{(one-tailed test)}$$
+
+::: callout-warning
+## The Importance of Background Genes
+
+Suppose you tested a cancer gene panel (n = 500) and found 50 DEGs.\
+Running ORA without a proper background → results will be **trivially enriched** in cancer pathways (selection bias!).
+
+**Correct approach:** Use all genes that were actually tested by DESeq2 (i.e., genes where `padj` is **not** NA) as the background universe.
+:::
+
+------------------------------------------------------------------------
+
+## Practice: Enrichr
+
+### Data Preparation in R
+
+```{r ora-data-prep}
+library(DESeq2)
+library(tidyverse)
+
+# 1. Load LFC-shrunken results
+resLFC <- readRDS('examples/data/w9_res_DESeq2_lfcShrink.rds')
+res_df <- resLFC %>%
+  as.data.frame() %>%
+  mutate(gene_id = rownames(.)) %>%
+  arrange(padj)
+
+# 2. Extract DEG list (|LFC| >= 1 & FDR <= 0.05)
+genes <- res_df %>%
+  filter(abs(log2FoldChange) >= 1, padj <= 0.05) %>%
+  .$gene_id
+
+cat("Number of DEGs:", length(genes), "\n")
+
+# 3. Save to file (for Enrichr upload)
+write.table(genes,
+            file      = 'examples/analysis/w9_myDEGs.txt',
+            sep       = "\t",
+            quote     = FALSE,
+            row.names = FALSE,
+            col.names = FALSE)
+
+# 4. Save background gene list
+total <- res_df %>%
+  filter(!is.na(padj)) %>%
+  .$gene_id
+
+write.table(total,
+            file      = 'examples/analysis/w9_myDEGs.txt',
+            sep       = "\t",
+            quote     = FALSE,
+            row.names = FALSE,
+            col.names = FALSE)
+
+cat("Number of background genes:", length(total), "\n")
+```
+
+------------------------------------------------------------------------
+
+### How to Use Enrichr
+
+1)  Go to <https://maayanlab.cloud/Enrichr/>
+
+2)  Paste your DEG list (`myDEGs.txt`)
+
+3)  Upload your background gene list (`total.txt`)
+
+    ![](/assets/img/part3/W9_enrichr.png)
+
+4)  **Pathways** tab → explore **Reactome**, **KEGG**
+
+5)  **Ontologies** tab → explore **GO Biological Process**
+
+    ![](/assets/img/part3/W9_enrichr_library.png)
+
+::: callout-tip
+## Interpreting Enrichr Results
+
+-   **Combined Score** = log(p-value) × z-score (Enrichr-specific metric)
+-   Only pathways passing **Adjusted P-value ≤ 0.05** are considered significant
+-   Pathways that appear **consistently across multiple databases** carry higher confidence
+:::
+
+------------------------------------------------------------------------
+
+## 📝 Week 9 Assignment
+
+No assignment this week — look forward to GSEA next week!\
+*(W8 review: Simple vs. Paired model comparison, Gold Standard Gene validation, Volcano Plot)*
+
+> Please just submit screenshots of your screen

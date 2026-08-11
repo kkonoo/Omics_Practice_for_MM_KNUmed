@@ -1,0 +1,412 @@
+---
+title: "W11. Vibe coding tips"
+author: "Eunji Ha"
+date: last-modified
+format:
+  html
+execute:
+  eval: false
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## 1. Vibe coding?
+
+> AI에게 자연어로 설명 → 코드 생성 → 실행 → 수정 반복 코드를 "외우는"
+> 것이 아니라, **AI에게 잘 시키는 법**을 배우는 것입니다.
+
+### Claude가 만드는 코드의 구조: 함수 정의 → main() 호출
+
+바이브코딩을 시작하기 전에, AI가 어떤 **패턴**으로 코드를 만드는지
+알아야 합니다.
+
+Claude에게 실제 분석을 요청하면 이 구조가 그대로 적용됩니다:
+
+```{r}
+#| eval: false
+
+# ============================================================
+# 0. library
+# ============================================================
+library(dplyr)
+library(survival)
+library(gtsummary)
+
+# ============================================================
+# 1. function definition
+# ============================================================
+load_data <- function(filepath) {
+  df <- readxl::read_excel(filepath)
+  df <- df |>
+    mutate(
+      age_group = ifelse(Age_Tx >= 65, "elderly", "non-elderly"),
+      Death = as.numeric(Death)
+    )
+  return(df)
+}
+
+make_table1 <- function(df, by_var) {
+  df |>
+    tbl_summary(by = all_of(by_var), missing = "no") |>
+    add_p() |>
+    bold_p()
+}
+
+run_survival <- function(df, time_var, event_var, group_var) {
+  formula <- as.formula(
+    paste0("Surv(", time_var, ", ", event_var, ") ~ ", group_var)
+  )
+  fit <- survfit(formula, data = df)
+  return(fit)
+}
+
+save_results <- function(tbl, fit, resdir) {
+  tbl |> as_flex_table() |>
+    flextable::save_as_docx(path = file.path(resdir, "table1.docx"))
+
+  p <- survminer::ggsurvplot(fit, pval = TRUE, risk.table = TRUE)
+  tiff(file.path(resdir, "KM_OS.tiff"), width = 7, height = 5,
+       units = "in", res = 300)
+  print(p)
+  dev.off()
+}
+
+# ============================================================
+# 2. Main
+# ============================================================
+main <- function() {
+  indir  <- "rawdata/"
+  resdir <- "results/"
+
+  df  <- load_data(file.path(indir, "patient_data.xlsx"))
+  tbl <- make_table1(df, by_var = "Multiplicity")
+  fit <- run_survival(df, "OS", "Death", "Multiplicity")
+  save_results(tbl, fit, resdir)
+
+  cat("Done!\n")
+}
+
+main()
+```
+
+::: callout-tip
+## AI 코드를 받으면 이렇게 읽으세요
+
+1.  **`main()` 먼저** → 전체 흐름 파악 (데이터 로드 → Table 1 → 생존분석
+    → 저장)
+2.  **각 함수의 input/output** → 인자와 `return`값 확인
+3.  **함수 하나씩 실행** → RStudio 콘솔에서 `load_data()`부터 순서대로
+4.  **에러나면 해당 함수만 디버깅** → 전체를 다시 돌릴 필요 없음
+:::
+
+------------------------------------------------------------------------
+
+## 프롬프트의 3요소
+
+좋은 프롬프트 = **역할 + 맥락 + 구체적 요청**
+
+### 나쁜 프롬프트
+
+```         
+통계 분석 해줘
+```
+
+→ AI가 뭘 해야 할지 모름. 쓸모없는 결과가 나옴.
+
+### 좋은 프롬프트 (주기적인 프롬프트 엔지니어링 follow-up 필요!! 3\~6개월)
+
+```         
+너는 임상통계 전문가야.
+
+나는 올리고전이 환자 대상 SBRT 논문을 쓰고 있어.
+데이터프레임 df_pt에 다음 변수가 있어:
+- Age_Tx: 치료 시 나이 (연속형)
+- Sex: 성별 (M/F)
+- Primary: 원발 부위 (Colon, Rectum, Lung 등)
+- Death: 사망 여부 (0/1)
+- OS: 전체 생존 기간 (개월)
+- size_cm: 종양 크기 (cm)
+- PTVmean_BED10: PTV 평균 BED10 (Gy)
+
+다음을 수행하는 R 코드를 작성해줘:
+1. gtsummary로 Table 1 생성 (Death 기준 그룹 비교, p-value 포함)
+2. 변수명은 논문용 라벨로 변환
+3. results/Table1.docx로 저장
+```
+
+::: callout-tip
+## 프롬프트 작성 팁
+
+1.  **`colnames(df)` 결과를 붙여넣기** — AI가 변수명을 정확히 알아야 함
+2.  **변수 타입 명시** — 연속형/범주형/생존시간 구분
+3.  **원하는 출력 형태 지정** — "Word로 저장", "tiff 300dpi", "forest
+    plot" 등
+4.  **패키지 지정** — "gtsummary로", "survminer로" 등
+:::
+
+------------------------------------------------------------------------
+
+## 실전 워크플로우
+
+바이브코딩의 현실적인 작업 흐름은 이렇습니다:
+
+```         
+1. RStudio에서 rds 로드
+2. AI가 만든 코드를 콘솔에 붙여넣기 & 실행
+3. 에러 → 에러 메시지를 AI에게 복붙 → 수정 코드 받기
+4. 중간 결과 확인 (head, str, plot 등)
+5. 만족하면 .R 파일로 저장
+6. input → output 구조의 스크립트 완성
+```
+
+핵심은 **처음부터 완벽한 스크립트를 만들려 하지 않는 것**입니다. RStudio
+콘솔에서 한 줄씩 돌려보고, 중간 과정을 계속 트러블슈팅해서 최종적으로
+동작하는 코드가 완성되면 그때 파일로 저장합니다.
+
+------------------------------------------------------------------------
+
+### ① RStudio에서 데이터 로드 & 구조 파악
+
+```{r}
+library(tidyverse)
+
+indir  <- "examples/analysis/"
+outdir <- "examples/analysis/"
+resdir <- "examples/results/"
+
+df_pt <- readRDS(paste0(indir, "w11_2_df_pt_processed.rds"))
+
+# 이 결과를 복사해서 AI에게 붙여넣기
+colnames(df_pt)
+str(df_pt)
+```
+
+------------------------------------------------------------------------
+
+### ② AI에게 프롬프트 작성
+
+`colnames()`과 `str()` 결과를 붙여넣고, 원하는 분석을 요청합니다.
+
+```         
+위 데이터에서 생존분석을 해줘.
+
+- Kaplan-Meier curve: Death/OS 기준, Multiplicity(single vs multiple)로 그룹 비교
+- Log-rank test p-value를 그래프에 표시
+- Risk table 포함
+- survminer 패키지 사용
+- 300 dpi tiff로 저장
+```
+
+------------------------------------------------------------------------
+
+### ③ AI가 준 코드를 콘솔에서 실행
+
+AI가 생성한 코드를 **한 블록씩** RStudio 콘솔에 붙여넣어 실행합니다.
+
+이때 위에서 본 **함수 + main 구조**로 코드가 올 가능성이 높습니다.\
+그 경우 `main()`을 바로 실행하지 말고, **함수 정의부를 먼저 실행**한 뒤
+함수를 하나씩 테스트하세요.
+
+```{r}
+library(survival)
+library(survminer)
+
+# Kaplan-Meier fit
+fit <- survfit(Surv(OS, Death) ~ Multiplicity, data = df_pt)
+
+# KM curve
+p <- ggsurvplot(
+  fit,
+  data = df_pt,
+  pval = TRUE,
+  risk.table = TRUE,
+  xlab = "Time (months)",
+  ylab = "Overall survival",
+  palette = c("#2E86AB", "#A23B72"),
+  ggtheme = theme_minimal()
+)
+
+print(p)
+```
+
+------------------------------------------------------------------------
+
+### ④ 에러가 나면?
+
+에러 메시지를 **그대로 복붙**해서 AI에게 주면 됩니다.
+
+```         
+이 코드를 실행했더니 다음 에러가 났어:
+
+Error in data.frame(..., check.names = FALSE) : 
+  arguments imply differing number of rows: 54, 0, 108
+
+고쳐줘.
+```
+
+→ AI가 `Death`가 factor라서 `Surv()`에서 인식 못하는 걸 잡아줌
+
+이런 식으로 **실행 → 에러 → AI에게 복붙 → 수정**을 반복합니다.
+
+::: callout-important
+## 무지성 에러 복붙의 함정
+
+에러가 나면 바로 AI에게 던지고 싶지만, **그 전에 30초만 직접 확인**하면
+훨씬 효율적입니다.
+
+**왜?** AI는 대화가 길어질수록 앞의 맥락을 잊습니다. 에러를 복붙하고 →
+AI가 부분 수정하고 → 또 에러 → 또 복붙... 이걸 반복하면 원래 깔끔했던
+코드가 **누더기**가 됩니다. 한 번에 고칠 수 있는 걸 돌아돌아 가게 되는
+거예요.
+
+**에러가 났을 때 먼저 해볼 것:**
+
+``` r
+# 1. 모르는 함수가 나왔으면 도움말 보기
+?survfit
+?ggsurvplot
+?tbl_summary
+
+# 2. RStudio에서는 Help 탭에 함수 이름 검색해도 됨
+#    → Arguments 섹션에서 각 인자가 뭘 받는지 확인
+#    → Examples 섹션에서 실제 사용법 확인
+```
+
+![](/assets/img/part4/W11_question.png){fig-align="center" width="277"
+height="41"}
+
+![](/assets/img/part4/W11_help.png){fig-align="center"}
+
+도움말의 **Arguments** 섹션만 훑어봐도 "아, 이 인자에 숫자를 넣어야
+하는데 문자를 넣었구나" 같은 단서를 바로 잡을 수 있습니다.
+
+**실전 예시:**
+
+``` r
+# AI가 만든 코드에서 에러 발생
+ggsurvplot(fit, pval.coord = "top-right")  # Error!
+
+# ?ggsurvplot → pval.coord는 c(x, y) 숫자 벡터임을 확인
+ggsurvplot(fit, pval.coord = c(0.1, 0.1))  # 해결 ✅
+```
+
+이렇게 **본인이 1차로 걸러낸 뒤** AI에게 물어보면, AI도 정확한 맥락에서
+답을 주기 때문에 수정이 한 번에 끝납니다.
+:::
+
+::: callout-tip
+## 에러 대응 순서
+
+1.  **에러 메시지 읽기** — 어떤 함수에서 터졌는지 확인
+2.  **`?함수명`으로 용법 확인** — 인자 타입, 필수/선택 여부
+3.  **그래도 모르겠으면** — 에러 + `?함수명`에서 본 내용을 같이 AI에게
+    주기
+
+```         
+이 코드에서 에러가 났어:
+[에러 메시지]
+
+?ggsurvplot 도움말을 보니 pval.coord는 
+numeric vector를 받는 것 같은데, 
+어떻게 고쳐야 해?
+```
+
+이렇게 주면 AI가 헛다리 짚을 확률이 크게 줄어듭니다.
+:::
+
+### ⑤ 동작 확인되면 스크립트로 저장
+
+콘솔에서 다 돌아가는 걸 확인했으면, 코드를 모아서 `.R` 파일로
+저장합니다. 이때 상단에 **input/output을 명시**하고, 경로를 `paste0()`로
+정리합니다.
+
+```{r}
+#| eval: false
+# ===== 03_KM_plot.R =====
+# Input:  analysis/2_df_pt_processed.rds
+# Output: results/KM_OS.tiff, results/KM_OS.pdf
+
+# ----- 디렉토리 -----
+indir  <- "examples/analysis/"
+resdir <- "examples/results/"
+
+library(tidyverse)
+library(survival)
+library(survminer)
+
+# 1. 데이터 로드
+df_pt <- readRDS(paste0(indir, "w11_2_df_pt_processed.rds"))
+
+# 2. KM fit
+fit <- survfit(Surv(OS, Death) ~ Multiplicity, data = df_pt)
+
+# 3. Plot
+p <- ggsurvplot(
+  fit,
+  data = df_pt,
+  pval = TRUE,
+  risk.table = TRUE,
+  xlab = "Time (months)",
+  ylab = "Overall survival",
+  palette = c("#2E86AB", "#A23B72"),
+  ggtheme = theme_minimal()
+)
+
+# 4. 저장
+tiff(paste0(resdir, "w11_KM_OS.tiff"), width = 7, height = 5, units = "in", res = 300)
+print(p)
+dev.off()
+
+ggsave(paste0(resdir, "w11_KM_OS.pdf"), plot = print(p), width = 7, height = 5)
+
+cat("✅ KM plot saved!\n")
+```
+
+``` bash
+Rscript 03_KM_plot.R
+```
+
+::: callout-note
+## 스크립트 상단에 Input/Output 적기
+
+``` r
+# Input:  examples/analysis/w11_2_df_pt_processed.rds
+# Output: examples/results/w11_KM_OS.tiff, results/KM_OS.pdf
+```
+
+이렇게 적어두면 나중에 파일만 봐도 **이 스크립트가 뭘 읽고 뭘 만드는지**
+바로 알 수 있습니다.
+:::
+
+------------------------------------------------------------------------
+
+## AI가 틀리기 쉬운 통계적 함정 (사전 지식이 중요한 이유)
+
+::: callout-warning
+1.  **Reference level 방향** — `relevel(factor, ref = "baseline")`을
+    빠뜨리는 경우 많음
+2.  **환자 vs 병변 단위 혼동** — OS는 환자 단위, LFFS는 병변 단위
+3.  **다중비교 보정 누락** — subgroup 여러 개 비교하면서 Bonferroni 안
+    하는 경우
+4.  **결측치 처리** — 기본값이 `na.rm = FALSE`라 결과가 `NA`로 나올 수
+    있음
+5.  **생존 시간/이벤트 뒤바꿈** — `Surv(time, event)` 순서 주의
+
+**이것들은 사람이 알아야 합니다.** 우리가 W2-W3에서 직접 R 문법을 배운
+이유입니다.
+:::
+
+------------------------------------------------------------------------
+
+## 바이브코딩 체크리스트
+
+```         
+✅ colnames()와 str() 결과를 AI에게 제공했는가?
+✅ 분석 단위(환자/병변)를 명시했는가?
+✅ 원하는 출력 형태를 지정했는가? (docx, tiff, html)
+✅ 사용할 패키지를 지정했는가?
+✅ AI 결과의 reference level, 단위, p-value를 직접 확인했는가?
+✅ 콘솔에서 동작 확인 후 .R 파일로 저장했는가?
+✅ 스크립트 상단에 Input/Output을 명시했는가?
+```

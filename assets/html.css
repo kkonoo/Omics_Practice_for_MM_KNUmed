@@ -1,0 +1,126 @@
+/* css styles */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-full.css');
+
+/* 컬러 팔레트 (Muted Violet) — 이 값들만 바꾸면 전체 색조가 바뀜 */
+:root {
+  --accent-900: #46396B;   /* h1 */
+  --accent-800: #55467F;   /* h2 */
+  --accent-700: #6B5B9A;   /* h3 */
+  --accent-500: #8477A6;   /* h4 */
+  --accent-050: #F4F1F9;   /* h1 배경 블록 */
+  --ink: #3A3A3A;          /* 본문 보조 텍스트 */
+}
+
+body {
+  font-family: "Pretendard", sans-serif;
+  font-size: 1.1em;   /* 기본 16px → ~17.6px */
+  font-weight: 500;  /* Medium */
+}
+
+/* 소제목 색상 */
+/* :not(.title) — 페이지 상단 문서 제목은 제외 */
+h1:not(.title) {
+  color: var(--accent-900); font-size: 1.7em; font-weight: 700;
+  background-color: var(--accent-050);
+  padding: 0.35em 0.5em;
+  border-radius: 8px;
+  margin: 1em 0 0.5em; /* 상하만 margin, 좌우는 0 */
+}
+h2 {
+  color: var(--accent-800); font-size: 1.4em; font-weight: 700;
+  background-color: transparent;
+  border-bottom: none;   /* Quarto 기본 h2 구분선 제거 */
+  padding: 0;
+  margin: 0.9em 0 0.4em;
+}
+h3 {
+  color: var(--accent-700); font-size: 1.2em; font-weight: 700;
+  padding: 0;            /* h4와 좌측 정렬 맞추기 */
+  margin: 0.8em 0 0.3em;
+}
+h4 {
+  color: var(--accent-500); font-size: 1.08em; font-weight: 600;  /* SemiBold */
+  margin: 0.7em 0 0.2em;
+}
+
+
+/* 코드 공통 */
+code, pre code {
+  font-family: 'D2Coding', 'Fira Code', monospace;
+  font-size: 1em;
+  font-weight: 500
+  border-radius: 6px;
+}
+
+pre {
+  border-radius: 6px;
+  padding: 1em;
+  border: none;
+}
+
+
+/* 일반 코드 블록 (``` 만 쓴 것) */
+pre:not(.sourceCode) {
+  background: #f5f5f5;
+}
+pre:not(.sourceCode) code {
+  color: #555;
+}
+
+/* R 코드 블록 */
+pre.sourceCode, pre.sourceCode code {
+  background: #f5f5f5; /* #f3f0f7: 연보라 */
+  margin: 0;
+}
+.cell-output,
+.cell-output-stderr,
+.cell-output-stdout {
+  margin: 0;
+  padding: 0;
+}
+.cell-output pre {
+  background: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* callout 박스 안 글씨체/크기 */
+.callout-body-container {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 1.2em;
+  font-weight: 500;  /* Medium */
+  color: #555;
+}
+
+/* callout 제목 글씨체 */
+.callout-title-container {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  font-size: 1.2em;
+  font-weight: 500;  /* Medium */
+  color: #555;
+}
+
+/* callout 컬러바 */
+.callout {
+  border-left: 3px solid;  /* 왼쪽 컬러바만 남기기 */
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* definition */
+dd,
+.callout-body-container {
+  color: #555;
+}
+
+
+/* plot정렬 */
+.cell-output-display {
+  display: flex;
+  justify-content: center;
+}
+

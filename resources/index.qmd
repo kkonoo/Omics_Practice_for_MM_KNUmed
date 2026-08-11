@@ -1,0 +1,12 @@
+---
+title: "오믹스 데이터 분석 기술"
+subtitle: "의학과 4학년 1학기. 분자의학 선택연구"
+author: "하은지 (분자의학교실)"
+date: last-modified
+format:
+  html
+---
+
+# Course Overview
+
+![](/assets/img/course.png){fig-align="center"}

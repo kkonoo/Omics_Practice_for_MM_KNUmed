@@ -1,0 +1,307 @@
+---
+title: "W6. Exploratory Data Analysis (EDA)"
+author: "Eunji Ha"
+date: last-modified
+format:
+  html
+execute:
+  echo: true
+  eval: false
+---
+
+## 1. Explanatory Data Analysis (EDA)
+
+Visualize data [before statistical analysis]{.underline} to **understand its overall characteristics and quality**
+
+-   **Quality Control**: identify outlier samples
+-   **Batch Effect Detection**: check whether technical noise (experiment date, instrument, etc.) is masking biological signal
+-   **Heteroscedasticity**: variance increases with expression level → a small number of highly expressed genes can dominate the entire analysis
+
+------------------------------------------------------------------------
+
+### Data Transformation: vst vs. rlog
+
+we need to transform our data (RNA-seq data) for statistic analyses
+
+![](/assets/img/part2/W6_hetero.png){fig-align="center" width="692"}
+
+::: callout-caution
+vst/rlog transformed values are **for visualization only**; raw counts must be used for differential analysis!
+:::
+
+------------------------------------------------------------------------
+
+### vst (Variance Stabilizing Transformation)
+
+::::: columns
+::: {.column width="50%"}
+-   Suitable for n ≥ 30 (large sample sizes)
+-   Based on a global trend → fast
+-   `asinh` transformation for highly-expressed genes
+:::
+
+::: {.column width="50%"}
+![](/assets/img/part2/W6_vst.png){fig-align="center"}
+:::
+:::::
+
+------------------------------------------------------------------------
+
+### rlog (Regularized Log)
+
+:::::: columns
+::: {.column width="50%"}
+-   Suitable for n \< 30 (small sample sizes)
+-   Per-gene shrinkage (Bayesian estimation) → slow
+-   Suppresses noise in low-count genes
+:::
+
+::: {.column width="50%"}
+![](/assets/img/part2/W6_rlog.png){fig-align="center" width="478"}
+:::
+
+------------------------------------------------------------------------
+
+::: callout-note
+## Imagine this
+
+```         
+gene A (low):
+sample 1: 1, sample 2: 5 ➡️ logFC = log2(5/1) = 2.32 … noise ↑
+
+gene B (high):
+sample 1: 1000, sample 2: 1004 ➡️ logFC = log2(1004/1000) = 0.005 … noise ↓ (stabilized)
+```
+:::
+::::::
+
+![](/assets/img/part2/W6_vst_trans.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+## 2. Visual Exploration (QC Part II)
+
+What to check through visualization:
+
+-   Is there a difference between groups?
+-   Are there any outlier samples?
+-   Is there a batch effect?
+
+::: callout-note
+## download practice data
+
+save the following files in `data/` in your R project
+
++------------------------+------------------------------------------------------------------------------------------------------+
+| File                   | Link                                                                                                 |
++========================+======================================================================================================+
+| `raw_counts_final.rds` | [📥 Download](https://drive.google.com/file/d/1Kq4f2v5hDkCsxrazGMF1aLZO5yu-m9h6/view?usp=drive_link) |
++------------------------+------------------------------------------------------------------------------------------------------+
+| `meta_data_final.rds`  | [📥 Download](https://drive.google.com/file/d/1-h3BRVmfl6hvlNfU-uma_wXQXNClDs-e/view?usp=drive_link) |
++------------------------+------------------------------------------------------------------------------------------------------+
+:::
+
+------------------------------------------------------------------------
+
+### data transformation for visualization
+
+```{r}
+#| eval: false
+
+# 1. read data (count table and metadata) ####
+countData <- readRDS('data/raw_counts_final.rds')
+dim(countData)
+head(countData[,1:5])
+
+colData <- readRDS("data/meta_data_final.rds")
+head(colData)
+table(colData$tissue_type)
+
+# check sample ids of the count table and metadata
+all(colnames(countData) == colData$barcode) # should be TRUE
+
+# set the Factor level (condition)
+# default: alphabetical ... ref = Control/Normal
+colData$condition <- factor(colData$tissue_type, levels = c("Normal", "Tumor")) 
+colData$condition
+# case / control ... treatment / control ... KO / control
+
+
+# 2. DESeq2 object (dds) ####
+# countData, colData, design
+dds <- DESeqDataSetFromMatrix(countData = countData,
+                              colData = colData,
+                              design = ~ patient + condition) # DEG by condition
+colData$patient = gsub('-','_',colData$patient)
+dds
+
+# 3. Pre-filtering (de-noising) ####
+dim(counts(dds))
+
+head(counts(dds)[,1:4])
+head(counts(dds)[,1:4]>=1)
+head(rowSums(counts(dds)[,1:4]>=1))
+head(rowSums(counts(dds)>=1))
+rowSums(counts(dds)) %>% head
+
+## 3-1. lowly expressed genes (for speed-up & statistical power) ####
+### option 1: simple (Total Count < 10?) ####
+keep <- rowSums(counts(dds)) >= 10
+head(keep)
+cat(paste("   Removed", sum(!keep), "low count genes.\n"))
+cat(paste("   Remaining genes:", sum(keep), "\n"))
+dds_filtered <- dds[keep, ]
+
+### option 2: considring group size (recommended) ####
+# Total Count < 10 in the smallest group?
+# ex: Control(3), Case(10) -> non-zero counts in at least 3 samples?
+main_condition = 'condition'
+smallestGroupSize <- min(table(colData[[main_condition]]))
+smallestGroupSize*0.4
+keep <- rowSums(counts(dds) >= 1) >= (smallestGroupSize*0.5)
+cat(paste("   Removed", sum(!keep), "low count genes.\n"))
+cat(paste("   Remaining genes:", sum(keep), "\n"))
+dds_filtered <- dds[keep, ]
+
+## 3-2. confounding genes ####
+all_genes <- rownames(dds_filtered)
+head(all_genes)
+# Mitochodiral: starting with "^MT-" 
+mt_genes <- grep("^MT-", all_genes, value = TRUE)
+mt_genes
+# Ribosomal: starting with "^RPS|^RPL"
+ribo_genes <- grep("^RPS|^RPL", all_genes, value = TRUE)
+ribo_genes
+# Immunoglobulin: starting with "^IG[HKL]" : "IGH", "IGK", "IGL"
+ig_genes <- grep("^IG[HKL]", all_genes, value = TRUE)
+ig_genes
+# filtering gene list
+contam_list <- c(mt_genes, ribo_genes, ig_genes)
+length(contam_list)
+# !: 'NOT'
+keep_indices <- !(all_genes %in% contam_list)
+dds_filtered <- dds_filtered[keep_indices, ]
+dds_filtered
+saveRDS(dds_filtered, 'dds_filtered.rds')
+
+# 4. Variance Stabilizing Transformation (vst) ####
+## 4-1. vst (normalization and transformation) ####
+vsd <- vst(dds_filtered, blind=FALSE) 
+# blind = FALSE: using design (recommended), blind=TRUE: using only technical noises
+
+# check the result visually
+vsd_data = assay(vsd)
+
+```
+
+------------------------------------------------------------------------
+
+### Sample Correlation Heatmap
+
+```{r}
+#| eval: false
+
+library(pheatmap)
+library(RColorBrewer)
+
+sampleDists <- dist(t(vsd_data))
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(vsd$condition, vsd$type, sep = "-")
+colnames(sampleDistMatrix) <- NULL
+
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         col = colors)
+```
+
+![](/assets/img/part2/W6_heatmap.png){fig-align="center" width="395"}
+
+------------------------------------------------------------------------
+
+### PCA Plot
+
+```{r}
+#| eval: false
+
+# PCA
+pca_res <- prcomp(t(vsd_data))
+pca_coords <- as.data.frame(pca_res$x[, 1:2])
+
+ggplot(pca_coords, aes(x = PC1, y = PC2)) +
+  geom_point(size = 3) +
+  ggtitle("PCA Result") +
+  theme_bw()
+```
+
+![](/assets/img/part2/W6_PCA.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+### PCA vs. MDS
+
+![](/assets/img/part2/W6_PCA_theory.png){fig-align="center"}
+
++--------------+-------------------------------------+---------------------------------------------------------+
+|              | PCA                                 | MDS                                                     |
++==============+=====================================+=========================================================+
+| Input        | **Raw data matrix** (sample × gene) | **Distance matrix** (sample × sample)                   |
++--------------+-------------------------------------+---------------------------------------------------------+
+| Goal         | Preserve **variance**               | Preserve pairwise **distances**                         |
++--------------+-------------------------------------+---------------------------------------------------------+
+| Method       | Eigen decomposition                 | Coordinate reconstruction                               |
++--------------+-------------------------------------+---------------------------------------------------------+
+| Benefit      | Loadings reveal important genes     | Supports various distance metrics\                      |
+|              |                                     | ([Euclidean]{.underline}-PCA, Correlation, Bray-Curtis) |
++--------------+-------------------------------------+---------------------------------------------------------+
+| Use          | General QC, sample clustering       | Microbiome, non-Euclidean distance                      |
++--------------+-------------------------------------+---------------------------------------------------------+
+
+------------------------------------------------------------------------
+
+## 3. Batch Effect
+
+-   Technical noise arising from experiment date, sequencing platform, operator, etc.
+-   Inspect alongside batch metadata in the PCA plot
+-   **Correction strategies**:
+    -   For visualization: use residuals from `limma::removeBatchEffect()`
+    -   For statistical testing: include batch in the design matrix (covered next week)
+
+```{r}
+#| eval: false
+
+library(limma)
+
+mat <- assay(vsd)
+mm <- model.matrix(~condition, colData(vsd))
+mat2 <- removeBatchEffect(mat, batch = vsd$patient, design = mm)
+
+# PCA after batch removal
+rv <- rowVars(mat2)
+select <- order(rv, decreasing = TRUE)[seq_len(min(500, length(rv)))]
+pca <- prcomp(t(mat2[select, ]))
+percentVar <- round(100 * pca$sdev^2 / sum(pca$sdev^2))
+
+pcaData2 <- data.frame(PC1 = pca$x[, 1], PC2 = pca$x[, 2],
+                        condition = colData(vsd)$condition)
+
+ggplot(pcaData2, aes(x = PC1, y = PC2, color = condition)) +
+  geom_point(size = 3) +
+  xlab(paste0("PC1: ", percentVar[1], "% variance")) +
+  ylab(paste0("PC2: ", percentVar[2], "% variance")) +
+  ggtitle("PCA - After Patient Effect Removal") +
+  theme_bw()
+```
+
+![](/assets/img/part2/W6_batch.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+## 📝 Week 6 Assignment
+
+> Please just submit screenshots of your screen.
+
+## References {.smaller}
+
+[DESeq2](https://link.springer.com/article/10.1186/s13059-014-0550-8)

@@ -1,0 +1,62 @@
+/* revealjs용 custom.css */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-full.css');
+
+/* 폰트 기본 */
+.reveal {
+  font-family: "Pretendard", sans-serif;
+}
+
+/* 소제목 색상 */
+.reveal h2 { color: #5B4D80; }
+.reveal h3 { color: #7A6A99; }
+.reveal h4 { color: #9A8DB5; }
+
+/* 코드 폰트 */
+.reveal code,
+.reveal pre code {
+  font-family: 'D2Coding', 'Fira Code', monospace;
+}
+
+/* 코드 블록 */
+.reveal pre {
+  border-radius: 6px;
+  border: none;
+  width: 100%;        /* revealjs 기본이 좁음 */
+}
+
+/* R 코드 블록 배경 */
+.reveal pre.sourceCode {
+  background: #f3f0f7;
+}
+
+/* callout */
+.reveal .callout {
+  border-left: 3px solid;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.reveal .callout-body-container {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 0.85em;
+  color: #555;
+}
+
+.reveal .callout-title-container {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  color: #555;
+}
+
+/* plot 정렬 */
+.reveal .cell-output-display {
+  display: flex;
+  justify-content: center;
+}
+.reveal .slide-content img {
+  display: block;
+  margin: 0 auto;
+}

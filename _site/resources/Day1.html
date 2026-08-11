@@ -1,0 +1,2941 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="하은지 (분자의학교실)">
+<meta name="dcterms.date" content="2026-08-11">
+
+<title>오믹스 데이터 분석 기술 Day 1</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../assets/img/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ce826da2fa3c9e096839ca24c2274fc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/html.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/img/logo.jpg" alt="" class="navbar-logo light-content">
+    <img src="../assets/img/logo.jpg" alt="" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../resources/index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../resources/Day1.html" aria-current="page"> 
+<span class="menu-text">Day1</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../resources/Day2.html"> 
+<span class="menu-text">Day2</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#todays-lecture" id="toc-todays-lecture" class="nav-link active" data-scroll-target="#todays-lecture">Today’s lecture</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">1. Introduction</a>
+  <ul>
+  <li><a href="#what-is-bioinformatics" id="toc-what-is-bioinformatics" class="nav-link" data-scroll-target="#what-is-bioinformatics">1) What is Bioinformatics?👩‍💻</a></li>
+  <li><a href="#ngs-and-omics" id="toc-ngs-and-omics" class="nav-link" data-scroll-target="#ngs-and-omics">2) NGS and Omics</a>
+  <ul>
+  <li><a href="#ngs" id="toc-ngs" class="nav-link" data-scroll-target="#ngs">① NGS</a>
+  <ul class="collapse">
+  <li><a href="#sanger-sequencing" id="toc-sanger-sequencing" class="nav-link" data-scroll-target="#sanger-sequencing">Sanger sequencing</a></li>
+  <li><a href="#ngs-1" id="toc-ngs-1" class="nav-link" data-scroll-target="#ngs-1"><strong>NGS</strong></a></li>
+  <li><a href="#single-end-vs.-paired-end" id="toc-single-end-vs.-paired-end" class="nav-link" data-scroll-target="#single-end-vs.-paired-end">Single-end vs.&nbsp;Paired-end</a></li>
+  </ul></li>
+  <li><a href="#omics-data" id="toc-omics-data" class="nav-link" data-scroll-target="#omics-data">② Omics data</a>
+  <ul class="collapse">
+  <li><a href="#fastq-format" id="toc-fastq-format" class="nav-link" data-scroll-target="#fastq-format">FASTQ Format</a></li>
+  <li><a href="#phred-quality-score" id="toc-phred-quality-score" class="nav-link" data-scroll-target="#phred-quality-score">Phred Quality Score</a></li>
+  </ul></li>
+  <li><a href="#central-dogma" id="toc-central-dogma" class="nav-link" data-scroll-target="#central-dogma">Central Dogma</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#공개-데이터베이스-rna-seq" id="toc-공개-데이터베이스-rna-seq" class="nav-link" data-scroll-target="#공개-데이터베이스-rna-seq">2. 공개 데이터베이스 (RNA-seq)</a>
+  <ul>
+  <li><a href="#오늘의-데이터-gse159857" id="toc-오늘의-데이터-gse159857" class="nav-link" data-scroll-target="#오늘의-데이터-gse159857">오늘의 데이터: GSE159857</a></li>
+  </ul></li>
+  <li><a href="#r-기초-프로그래밍" id="toc-r-기초-프로그래밍" class="nav-link" data-scroll-target="#r-기초-프로그래밍">3. R 기초 프로그래밍</a>
+  <ul>
+  <li><a href="#r-r-studio-설치하기" id="toc-r-r-studio-설치하기" class="nav-link" data-scroll-target="#r-r-studio-설치하기">1) R &amp; R studio 설치하기</a>
+  <ul>
+  <li><a href="#why-r" id="toc-why-r" class="nav-link" data-scroll-target="#why-r">Why R?</a></li>
+  <li><a href="#install-r" id="toc-install-r" class="nav-link" data-scroll-target="#install-r">① install R</a></li>
+  <li><a href="#install-r-studio" id="toc-install-r-studio" class="nav-link" data-scroll-target="#install-r-studio">② install R studio</a></li>
+  </ul></li>
+  <li><a href="#r-기초-문법" id="toc-r-기초-문법" class="nav-link" data-scroll-target="#r-기초-문법">2) R 기초 문법</a>
+  <ul>
+  <li><a href="#data-types-in-r" id="toc-data-types-in-r" class="nav-link" data-scroll-target="#data-types-in-r">① Data Types in R</a>
+  <ul class="collapse">
+  <li><a href="#vector-1d" id="toc-vector-1d" class="nav-link" data-scroll-target="#vector-1d">Vector (1D)</a></li>
+  <li><a href="#matrix-2d" id="toc-matrix-2d" class="nav-link" data-scroll-target="#matrix-2d">Matrix (2D)</a></li>
+  <li><a href="#data-frame-2d" id="toc-data-frame-2d" class="nav-link" data-scroll-target="#data-frame-2d">Data Frame (2D)</a></li>
+  <li><a href="#list" id="toc-list" class="nav-link" data-scroll-target="#list">List</a></li>
+  </ul></li>
+  <li><a href="#operations-in-r" id="toc-operations-in-r" class="nav-link" data-scroll-target="#operations-in-r">② Operations in R</a>
+  <ul class="collapse">
+  <li><a href="#arithmetic" id="toc-arithmetic" class="nav-link" data-scroll-target="#arithmetic">Arithmetic</a></li>
+  <li><a href="#logical" id="toc-logical" class="nav-link" data-scroll-target="#logical">Logical</a></li>
+  </ul></li>
+  <li><a href="#basic-programming-with-r" id="toc-basic-programming-with-r" class="nav-link" data-scroll-target="#basic-programming-with-r">③ Basic Programming with R</a>
+  <ul class="collapse">
+  <li><a href="#i.-functions" id="toc-i.-functions" class="nav-link" data-scroll-target="#i.-functions">i. Functions</a>
+  <ul class="collapse">
+  <li><a href="#math" id="toc-math" class="nav-link" data-scroll-target="#math">Math</a></li>
+  <li><a href="#statistical" id="toc-statistical" class="nav-link" data-scroll-target="#statistical">Statistical</a></li>
+  <li><a href="#user-defined" id="toc-user-defined" class="nav-link" data-scroll-target="#user-defined">User-defined</a></li>
+  </ul></li>
+  <li><a href="#ii.-if-else" id="toc-ii.-if-else" class="nav-link" data-scroll-target="#ii.-if-else">ii. if / else</a></li>
+  <li><a href="#iii.-for-while" id="toc-iii.-for-while" class="nav-link" data-scroll-target="#iii.-for-while">iii. for / while</a></li>
+  <li><a href="#iv.-apply-family" id="toc-iv.-apply-family" class="nav-link" data-scroll-target="#iv.-apply-family">iv. apply family</a></li>
+  </ul></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages">④ Packages</a>
+  <ul class="collapse">
+  <li><a href="#cran" id="toc-cran" class="nav-link" data-scroll-target="#cran">CRAN</a></li>
+  <li><a href="#bioconductor" id="toc-bioconductor" class="nav-link" data-scroll-target="#bioconductor">Bioconductor</a></li>
+  </ul></li>
+  <li><a href="#working-directory-file-io" id="toc-working-directory-file-io" class="nav-link" data-scroll-target="#working-directory-file-io">⑤ Working Directory &amp; File I/O</a>
+  <ul class="collapse">
+  <li><a href="#working-directory" id="toc-working-directory" class="nav-link" data-scroll-target="#working-directory">Working Directory</a></li>
+  <li><a href="#r-project-.rproj" id="toc-r-project-.rproj" class="nav-link" data-scroll-target="#r-project-.rproj">R Project (.Rproj)</a></li>
+  <li><a href="#file-read-write" id="toc-file-read-write" class="nav-link" data-scroll-target="#file-read-write">File Read &amp; Write</a>
+  <ul class="collapse">
+  <li><a href="#csv-tsv" id="toc-csv-tsv" class="nav-link" data-scroll-target="#csv-tsv">CSV / TSV</a></li>
+  <li><a href="#excel" id="toc-excel" class="nav-link" data-scroll-target="#excel">Excel</a></li>
+  </ul></li>
+  <li><a href="#rds-r-data-serialization" id="toc-rds-r-data-serialization" class="nav-link" data-scroll-target="#rds-r-data-serialization">RDS (R Data Serialization)</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#practice-basic-programming-in-r" id="toc-practice-basic-programming-in-r" class="nav-link" data-scroll-target="#practice-basic-programming-in-r">3) Practice | basic programming in R</a></li>
+  </ul></li>
+  <li><a href="#bulk-rna-seq-data" id="toc-bulk-rna-seq-data" class="nav-link" data-scroll-target="#bulk-rna-seq-data">4. Bulk RNA-seq Data</a>
+  <ul>
+  <li><a href="#details-in-pre-processing-of-rna-seq-data" id="toc-details-in-pre-processing-of-rna-seq-data" class="nav-link" data-scroll-target="#details-in-pre-processing-of-rna-seq-data">1) details in pre-processing of RNA-seq data</a></li>
+  <li><a href="#normalization" id="toc-normalization" class="nav-link" data-scroll-target="#normalization">2) Normalization</a>
+  <ul>
+  <li><a href="#why-normalization-is-needed" id="toc-why-normalization-is-needed" class="nav-link" data-scroll-target="#why-normalization-is-needed">Why Normalization is Needed</a></li>
+  <li><a href="#standard-normalization-methods-for-rna-seq-tmm-rle" id="toc-standard-normalization-methods-for-rna-seq-tmm-rle" class="nav-link" data-scroll-target="#standard-normalization-methods-for-rna-seq-tmm-rle">standard normalization methods for RNA-seq: TMM &amp; RLE</a></li>
+  <li><a href="#normalization-methods-comparison" id="toc-normalization-methods-comparison" class="nav-link" data-scroll-target="#normalization-methods-comparison">Normalization Methods Comparison</a></li>
+  </ul></li>
+  <li><a href="#practice-normalization" id="toc-practice-normalization" class="nav-link" data-scroll-target="#practice-normalization">3) Practice | normalization</a>
+  <ul>
+  <li><a href="#raw-counts-fake" id="toc-raw-counts-fake" class="nav-link" data-scroll-target="#raw-counts-fake">① raw counts (fake)</a></li>
+  <li><a href="#cpm-counts-per-million" id="toc-cpm-counts-per-million" class="nav-link" data-scroll-target="#cpm-counts-per-million">② CPM (counts per million)</a></li>
+  <li><a href="#rpkm-reads-per-killobase-million" id="toc-rpkm-reads-per-killobase-million" class="nav-link" data-scroll-target="#rpkm-reads-per-killobase-million">③ RPKM (reads per killobase million)</a></li>
+  <li><a href="#tpm-transcripts-per-million" id="toc-tpm-transcripts-per-million" class="nav-link" data-scroll-target="#tpm-transcripts-per-million">④ TPM (transcripts per million)</a></li>
+  <li><a href="#tmm-from-edger" id="toc-tmm-from-edger" class="nav-link" data-scroll-target="#tmm-from-edger">⑤ TMM from edgeR</a></li>
+  <li><a href="#rle-from-deseq2" id="toc-rle-from-deseq2" class="nav-link" data-scroll-target="#rle-from-deseq2">⑥ RLE from DESeq2</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">⑦ visualization</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">➕ references</a>
+  <ul>
+  <li><a href="#ngs-2" id="toc-ngs-2" class="nav-link" data-scroll-target="#ngs-2">NGS</a></li>
+  <li><a href="#omics-data-1" id="toc-omics-data-1" class="nav-link" data-scroll-target="#omics-data-1">Omics data</a></li>
+  <li><a href="#rna-seq" id="toc-rna-seq" class="nav-link" data-scroll-target="#rna-seq">RNA-seq</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">오믹스 데이터 분석 기술 Day 1</h1>
+<p class="subtitle lead">의학과 4학년 1학기 - 분자의학 선택연구</p>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-left">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>하은지 (분자의학교실) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 11, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="todays-lecture" class="level1">
+<h1>Today’s lecture</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/day1.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="introduction" class="level1">
+<h1>1. Introduction</h1>
+<section id="what-is-bioinformatics" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-bioinformatics">1) What is Bioinformatics?👩‍💻</h2>
+<ul>
+<li><p>Bio + information</p>
+<p><img src="..\assets/img/NGS/Bioinformatics.png" class="img-fluid"></p>
+<p>Bio ➡️ Human samples (with certain phenotypes)</p>
+<p>Information ➡️ Data (Omics)</p></li>
+</ul>
+<hr>
+</section>
+<section id="ngs-and-omics" class="level2">
+<h2 class="anchored" data-anchor-id="ngs-and-omics">2) NGS and Omics</h2>
+<p>Omics data is generated by NGS</p>
+<section id="ngs" class="level3">
+<h3 class="anchored" data-anchor-id="ngs">① NGS</h3>
+<blockquote class="blockquote">
+<p><u>next-generation</u> sequencing</p>
+</blockquote>
+<ul>
+<li><p>massive parallel</p></li>
+<li><p>high-throughput</p></li>
+<li><p>scalable &amp; cost-efficient</p></li>
+</ul>
+<p>What is difference between <strong>Sanger Sequencing</strong> and <strong>Next-Generation Sequencing (NGS)</strong>?</p>
+<section id="sanger-sequencing" class="level4">
+<h4 class="anchored" data-anchor-id="sanger-sequencing">Sanger sequencing</h4>
+<blockquote class="blockquote">
+<p>ddNTP with flourchromes</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/NGS/sanger_seq.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="709"></p>
+</figure>
+</div>
+<hr>
+</section>
+<section id="ngs-1" class="level4">
+<h4 class="anchored" data-anchor-id="ngs-1"><strong>NGS</strong></h4>
+<blockquote class="blockquote">
+<p>library preparation + sequencing by synthesis</p>
+</blockquote>
+<ul>
+<li><p>Library prep &amp; bridge amplification</p>
+<p><img src="..\assets/img/NGS/library_prep.png" class="img-fluid" data-plot-algin="center"></p></li>
+</ul>
+<hr>
+<ul>
+<li><p>NGS library molecule: adapter + insert</p>
+<ul>
+<li>P5/P7 (binding to flow cell)</li>
+<li>Index (Sample identifier, 6-12nt, multiplexing)</li>
+<li>Primer (e.g., PolyA for mRNA, 6-mer for total RNAs)</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/NGS/RNA_seq_library_prep.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div></li>
+</ul>
+<hr>
+<ul>
+<li><p>sequencing by synthesis (SBS)</p>
+<p><img src="..\assets/img/NGS/SBS0.png" class="img-fluid" data-plot-algin="center" width="111"> <img src="..\assets/img/NGS/SBS1.png" class="img-fluid" data-plot-algin="center" width="100"> <img src="..\assets/img/NGS/SBS00.jpg" class="img-fluid" data-plot-algin="center" width="144"> <img src="..\assets/img/NGS/SBS2.png" class="img-fluid" data-plot-algin="center" width="287"></p>
+<p><img src="..\assets/img/NGS/SBS3.png" class="img-fluid" data-plot-algin="center" width="233"> <img src="..\assets/img/NGS/SBS5.png" class="img-fluid" data-plot-algin="center" width="393"></p></li>
+</ul>
+<hr>
+</section>
+<section id="single-end-vs.-paired-end" class="level4">
+<h4 class="anchored" data-anchor-id="single-end-vs.-paired-end">Single-end vs.&nbsp;Paired-end</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/NGS/paired_end.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="omics-data" class="level3">
+<h3 class="anchored" data-anchor-id="omics-data">② Omics data</h3>
+<ul>
+<li>holistic &amp; comprehensive</li>
+<li>high-dimensional … large p, small n</li>
+<li>Multi-layered hierarchical … central dogma</li>
+</ul>
+<section id="fastq-format" class="level4">
+<h4 class="anchored" data-anchor-id="fastq-format">FASTQ Format</h4>
+<ul>
+<li>information of sequence</li>
+<li>four lines per read (n=20~30M)</li>
+</ul>
+<pre><code>@SRR21484222.626.1 626 length=51       ← Read ID 
+GCCTTGGTGGTGAAATGGTAGACTGGAATTCTCGGGTGCCAAGGAACTCCA  ← Sequence 
++SRR21484222.626.1 626 length=51       ← Description 
+F:FFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFF:,FFFFFFFFF  ← Base call quality (Phred score)</code></pre>
+</section>
+<section id="phred-quality-score" class="level4">
+<h4 class="anchored" data-anchor-id="phred-quality-score">Phred Quality Score</h4>
+<p><span class="math inline">\(Q = -10 \log_{10} P\)</span></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Phred Score</th>
+<th>Error rate</th>
+<th>Base call accruary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td>1 in 10</td>
+<td>90%</td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>1 in 100</td>
+<td>99%</td>
+</tr>
+<tr class="odd">
+<td>30</td>
+<td>1 in 1,000</td>
+<td>99.9%</td>
+</tr>
+<tr class="even">
+<td>40</td>
+<td>1 in 10,000</td>
+<td>99.99%</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="central-dogma" class="level3">
+<h3 class="anchored" data-anchor-id="central-dogma">Central Dogma</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/central_dogma.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<p>We will focus on <u>transcriptomes</u> (RNA-seq data)</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="공개-데이터베이스-rna-seq" class="level1">
+<h1>2. 공개 데이터베이스 (RNA-seq)</h1>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">DB</th>
+<th>내용</th>
+<th>링크</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>GEO</strong></td>
+<td>Count matrix + Metadata<br>NCBI에서 운영</td>
+<td><a href="https://www.ncbi.nlm.nih.gov/geo/">ncbi.nlm.nih.gov/geo</a></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>TCGA</strong></td>
+<td>암 데이터 (33개 암종)<br>GDC Data Portal</td>
+<td><a href="https://portal.gdc.cancer.gov/">portal.gdc.cancer.gov</a></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>GTEx</strong></td>
+<td>정상 조직 발현 데이터<br>54 tissue types</td>
+<td><a href="https://gtexportal.org/">gtexportal.org</a></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>SRA</strong></td>
+<td>Raw sequencing data<br>FASTQ files</td>
+<td><a href="https://www.ncbi.nlm.nih.gov/sra/">ncbi.nlm.nih.gov/sra</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>💡좋은 데이터셋 기준</strong>:</p>
+<p>- 충분한 샘플 수 (N &gt; 30)<br>
+- 명확한 디자인 (Control vs.&nbsp;Case)<br>
+- 풍부한 임상정보 (metadata)</p>
+<section id="오늘의-데이터-gse159857" class="level2">
+<h2 class="anchored" data-anchor-id="오늘의-데이터-gse159857">오늘의 데이터: GSE159857</h2>
+<blockquote class="blockquote">
+<p>Paired design: 환자 내 변이(patient effect)를 통계적으로 보정할 수 있어 더 정밀한 분석 가능</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/geo.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="r-기초-프로그래밍" class="level1">
+<h1>3. R 기초 프로그래밍</h1>
+<section id="r-r-studio-설치하기" class="level2">
+<h2 class="anchored" data-anchor-id="r-r-studio-설치하기">1) R &amp; R studio 설치하기</h2>
+<p>General workflow of clinical researchers (?)</p>
+<pre><code>Excel에서 데이터 정리 → SPSS에서 분석 → 결과를 Word에 복붙 → 리뷰어 코멘트 → 처음부터 다시...</code></pre>
+<section id="why-r" class="level3">
+<h3 class="anchored" data-anchor-id="why-r">Why R?</h3>
+<p>✅ Comprehensive statistics beoynd Excel<br>
+✅ Free &amp; Open-Source &gt;&gt; SPSS<br>
+✅ Publication-Quality Visualization<br>
+✅ Biological &amp; Biomedical Packages</p>
+<hr>
+</section>
+<section id="install-r" class="level3">
+<h3 class="anchored" data-anchor-id="install-r">① install R</h3>
+<p><a href="https://cran.r-project.org/">The Comprehensive R Archive Network (CRAN)</a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/R.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+<section id="install-r-studio" class="level3">
+<h3 class="anchored" data-anchor-id="install-r-studio">② install R studio</h3>
+<blockquote class="blockquote">
+<p>IDE (Integrated Development Environment) for R</p>
+</blockquote>
+<p><a href="https://posit.co/download/rstudio-desktop/">RStudio Desktop - Posit</a></p>
+<p><img src="..\assets/img/rstudio.png" class="img-fluid"></p>
+<hr>
+</section>
+</section>
+<section id="r-기초-문법" class="level2">
+<h2 class="anchored" data-anchor-id="r-기초-문법">2) R 기초 문법</h2>
+<section id="data-types-in-r" class="level3">
+<h3 class="anchored" data-anchor-id="data-types-in-r">① Data Types in R</h3>
+<section id="vector-1d" class="level4">
+<h4 class="anchored" data-anchor-id="vector-1d">Vector (1D)</h4>
+<ul>
+<li>The most fundamental data structure in R</li>
+<li>to store multiple values of the <u>same type</u>: numeric, character, or logical</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. vector ####</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>my_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>) <span class="co"># c: combine</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>my_vector</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">### numeric ####</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span><span class="sc">:</span><span class="dv">1</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">5</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>?seq</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="at">from=</span><span class="dv">1</span>, <span class="at">to=</span><span class="dv">5</span>, <span class="at">by=</span><span class="dv">1</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="dv">1</span>,<span class="dv">5</span>, <span class="dv">2</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(my_vector)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="do">### character ####</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>gender <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"F"</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>gender <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'M'</span>, <span class="st">'F'</span>, <span class="st">'F'</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>gender</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="do">#### factor ####</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>factor_gender_vector <span class="ot">&lt;-</span> <span class="fu">factor</span>(gender)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>factor_gender_vector</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(factor_gender_vector)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Ordinal categorical vector </span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>factor_gender_vector <span class="ot">&lt;-</span> <span class="fu">factor</span>(gender, <span class="at">order=</span><span class="cn">TRUE</span>, <span class="at">levels=</span><span class="fu">c</span>(<span class="st">'F'</span>,<span class="st">'M'</span>))</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>factor_gender_vector</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(factor_gender_vector)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="do">### logical ####</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>recur <span class="ot">=</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>recur</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>recur <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'TRUE'</span>, <span class="st">'FALSE'</span>, <span class="st">'TRUE'</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>recur</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Checking and Converting Data Types</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## class, is: check your data type ####</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(my_vector)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(gender)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(recur)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">is.character</span>(my_vector)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">is.character</span>(gender)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">is.numeric</span>(my_vector)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">is.logical</span>(recur)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="do">## as: change your vector type ####</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">as.character</span>(my_vector)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">as.numeric</span>(gender)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="matrix-2d" class="level4">
+<h4 class="anchored" data-anchor-id="matrix-2d">Matrix (2D)</h4>
+<p>A two-dimensional structure that holds only <u>a single data type</u></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 2-1. matrix ####</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Construct a matrix with 5 rows that contain the numbers 1 up to 10 and 'byrow =  TRUE' </span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>matrix_a <span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>, <span class="at">nrow =</span> <span class="dv">5</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>matrix_a</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>matrix_b <span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">byrow =</span> <span class="cn">FALSE</span>, <span class="at">nrow =</span> <span class="dv">5</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>matrix_b</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="do">## dim, nrow, ncol: check your matrix ####</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(matrix_a)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(matrix_a)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(matrix_a)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="do">## rownames, colnames: name your matrix ####</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(matrix_a) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Row 1"</span>, <span class="st">"Row 2"</span>, <span class="st">"Row 3"</span>, <span class="st">"Row 4"</span>, <span class="st">"Row 5"</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(matrix_a) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Col 1"</span>, <span class="st">"Col 2"</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>matrix_a</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="do">## cbind, rbind: append to the matrix ####</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>matrix_a1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(matrix_a, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>matrix_a1</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>matrix_a2 <span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="dv">13</span><span class="sc">:</span><span class="dv">24</span>, <span class="at">byrow =</span> <span class="cn">FALSE</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>matrix_a2</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>matrix_c <span class="ot">&lt;-</span><span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="at">byrow =</span> <span class="cn">FALSE</span>, <span class="at">ncol =</span> <span class="dv">3</span>)        </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>matrix_c</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>matrix_d <span class="ot">&lt;-</span> <span class="fu">cbind</span>(matrix_a2, matrix_c)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>matrix_d</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(matrix_d)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>add_row <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>add_row</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>matrix_c <span class="ot">&lt;-</span> <span class="fu">rbind</span>(matrix_c, add_row)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(matrix_c)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>matrix_c</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Matrix Indexing</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/mat.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>matrix_c[<span class="dv">1</span>, <span class="dv">2</span>]     <span class="co"># row 1, col 2 (element)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>matrix_c[<span class="dv">1</span>, ]       <span class="co"># entire row 1</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>matrix_c[, <span class="dv">1</span>]       <span class="co"># entire col 1</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>matrix_c[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span>]  <span class="co"># subset selection</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>matrix_c[<span class="sc">-</span><span class="dv">1</span>, ]      <span class="co"># exclude row 1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="data-frame-2d" class="level4">
+<h4 class="anchored" data-anchor-id="data-frame-2d">Data Frame (2D)</h4>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li>A two-dimensional structure that can hold <u>multiple data types</u></li>
+<li>Most commonly used in real-world analyses</li>
+</ul>
+</div><div class="column" style="width:30%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/df.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 2-2. dataframe ####</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">35</span>, <span class="dv">42</span>, <span class="dv">50</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"F"</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="do">## str: check your data structure ####</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(matrix_a)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(df)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(df)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ncol</span>(df)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(df)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(df)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(matrix_a)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="do">## name your variables ####</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'age'</span>, <span class="st">'gender'</span>, <span class="st">'recur'</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span>,<span class="dv">2</span>]</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>df[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,]</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>df[,<span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## $: select a column of your interest ####</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>age</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>BMI <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">19</span>,<span class="dv">35</span>,<span class="dv">25</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>BMI <span class="ot">&lt;-</span> BMI</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>BMI</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>df[,<span class="st">'BMI'</span>]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="do">## subset ####</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(df, <span class="at">subset =</span> BMI <span class="sc">&gt;</span> <span class="dv">30</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## sort and order ####</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort by BMI</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>df_order <span class="ot">&lt;-</span>df[<span class="fu">order</span>(df<span class="sc">$</span>BMI),]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_order)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">order</span>(df<span class="sc">$</span>BMI)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(df<span class="sc">$</span>BMI)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort by c3 and c4</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>df_order <span class="ot">&lt;-</span>df[<span class="fu">order</span>(df<span class="sc">$</span>gender, df<span class="sc">$</span>BMI),]</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_order)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort by c3(descending) and c4(acending)</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>df_order <span class="ot">&lt;-</span>df[<span class="fu">order</span>(<span class="sc">-</span>df<span class="sc">$</span>age),]</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_order)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="list" class="level4">
+<h4 class="anchored" data-anchor-id="list">List</h4>
+<p>A container that groups together data of different types and structures.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. list ####</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>vect  <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>mat  <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(mat)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># select the first five rows of the built-in R data set iris</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> iris[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Construct list with these vec, mat, and df:</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>my_list <span class="ot">&lt;-</span> <span class="fu">list</span>(vect, mat, df)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>my_list</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co"># indexing list</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>my_list[[<span class="dv">2</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="operations-in-r" class="level3">
+<h3 class="anchored" data-anchor-id="operations-in-r">② Operations in R</h3>
+<section id="arithmetic" class="level4">
+<h4 class="anchored" data-anchor-id="arithmetic">Arithmetic</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>+</code></td>
+<td>Addition</td>
+<td><code>3 + 4</code></td>
+</tr>
+<tr class="even">
+<td><code>-</code></td>
+<td>Subtraction</td>
+<td><code>5 - 2</code></td>
+</tr>
+<tr class="odd">
+<td><code>*</code></td>
+<td>Multiplication</td>
+<td><code>3 * 5</code></td>
+</tr>
+<tr class="even">
+<td><code>/</code></td>
+<td>Division</td>
+<td><code>(5+5) / 2</code></td>
+</tr>
+<tr class="odd">
+<td><code>^</code> or <code>**</code></td>
+<td>Exponentiation</td>
+<td><code>2^5</code></td>
+</tr>
+<tr class="even">
+<td><code>%%</code></td>
+<td>Modulo</td>
+<td><code>27 %% 6</code> → 3</td>
+</tr>
+<tr class="odd">
+<td><code>%/%</code></td>
+<td>Integer divide</td>
+<td><code>27 %/% 6</code> → 4</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. calculation ####</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">## An addition ####</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="sc">+</span> <span class="dv">4</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="do">## A multiplication ####</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span><span class="sc">*</span><span class="dv">5</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## A division ####</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>(<span class="dv">5</span><span class="sc">+</span><span class="dv">5</span>)<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Exponentiation ####</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">^</span><span class="dv">5</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">**</span><span class="dv">5</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Modulo : %% (나머지) ####</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span><span class="sc">%%</span><span class="dv">6</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Quotient : %/% (몫) ####</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span><span class="sc">%/%</span><span class="dv">6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="logical" class="level4">
+<h4 class="anchored" data-anchor-id="logical">Logical</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code></td>
+<td>Comparison</td>
+</tr>
+<tr class="even">
+<td><code>==</code></td>
+<td>Equal to</td>
+</tr>
+<tr class="odd">
+<td><code>!=</code></td>
+<td>Not equal to</td>
+</tr>
+<tr class="even">
+<td><code>x | y</code></td>
+<td>OR</td>
+</tr>
+<tr class="odd">
+<td><code>x &amp; y</code></td>
+<td>AND</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. logical operators ####</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector from 1 to 10</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>logical_vector <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>logical_vector</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="do">## logical statement ####</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>logical_vector <span class="sc">&gt;</span> <span class="dv">5</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>logical_vector[(logical_vector<span class="sc">&gt;</span><span class="dv">4</span>) <span class="sc">&amp;</span> (logical_vector<span class="sc">&lt;</span><span class="dv">7</span>)]</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>logical_vector[(logical_vector<span class="sc">&gt;</span><span class="dv">4</span>) <span class="sc">|</span> (logical_vector<span class="sc">&lt;</span><span class="dv">7</span>)]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2-2. which ####</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Slice the first five rows of the vector</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>slice_vector <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>slice_vector[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>slice_vector[<span class="fu">which</span>(slice_vector <span class="sc">%%</span> <span class="dv">3</span> <span class="sc">==</span> <span class="dv">0</span>)]  <span class="co"># 3의 배수만 출력</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="basic-programming-with-r" class="level3">
+<h3 class="anchored" data-anchor-id="basic-programming-with-r">③ Basic Programming with R</h3>
+<section id="i.-functions" class="level4">
+<h4 class="anchored" data-anchor-id="i.-functions">i. Functions</h4>
+<section id="math" class="level5">
+<h5 class="anchored" data-anchor-id="math">Math</h5>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>abs(x)</code></td>
+<td>Absolute value</td>
+</tr>
+<tr class="even">
+<td><code>log(x, base=y)</code></td>
+<td>Logarithm (default: natural log)</td>
+</tr>
+<tr class="odd">
+<td><code>exp(x)</code></td>
+<td><span class="math inline">\(e^x\)</span></td>
+</tr>
+<tr class="even">
+<td><code>sqrt(x)</code></td>
+<td><span class="math inline">\(\sqrt{x}\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>factorial(x)</code></td>
+<td><span class="math inline">\(x!\)</span></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. General function ####</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># cbind(), rbind(), range(), sort(), order(), length()</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Maths function ####</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>x_vector <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">45</span>,<span class="dv">55</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#logarithm</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(x_vector)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#exponential</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(x_vector)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#squared root</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(x_vector)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#factorial</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="fu">factorial</span>(x_vector)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="statistical" class="level5">
+<h5 class="anchored" data-anchor-id="statistical">Statistical</h5>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>mean(x)</code></td>
+<td>Mean</td>
+</tr>
+<tr class="even">
+<td><code>median(x)</code></td>
+<td>Median</td>
+</tr>
+<tr class="odd">
+<td><code>var(x)</code></td>
+<td>Variance</td>
+</tr>
+<tr class="even">
+<td><code>sd(x)</code></td>
+<td>Standard deviation</td>
+</tr>
+<tr class="odd">
+<td><code>scale(x)</code></td>
+<td>Z-score</td>
+</tr>
+<tr class="even">
+<td><code>quantile(x)</code></td>
+<td>Quantiles</td>
+</tr>
+<tr class="odd">
+<td><code>summary(x)</code></td>
+<td>Summary statistics</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Statistical function ####</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>speed <span class="ot">&lt;-</span> cars<span class="sc">$</span>speed</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>speed</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean speed of cars dataset</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(speed)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Median speed of cars dataset</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(speed)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Variance speed of cars dataset</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(speed)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard deviation speed of cars dataset</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(speed)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize vector speed of cars dataset      </span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">scale</span>(speed), <span class="dv">5</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Quantile speed of cars dataset</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(speed)</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary speed of cars dataset</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(speed)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="user-defined" class="level5">
+<h5 class="anchored" data-anchor-id="user-defined">User-defined</h5>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. function ####</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 4-1. One argument function ####</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>square_function<span class="ot">&lt;-</span> <span class="cf">function</span>(n) </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># compute the square of integer `n`</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  n<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>}  </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># calling the function and passing value 4</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">square_function</span>(<span class="dv">4</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(square_function)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>square_function</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 4-2. multiple argument ####</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="cf">function</span>(x,y) {</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  x<span class="sc">*</span>y</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu">times</span>(<span class="dv">2</span>,<span class="dv">4</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. enrivonment: function + variable + data + ...</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>(<span class="fu">environment</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="ii.-if-else" class="level4">
+<h4 class="anchored" data-anchor-id="ii.-if-else">ii. if / else</h4>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. if ####</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="do">## if ####</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create vector quantity</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>quantity <span class="ot">&lt;-</span>  <span class="dv">25</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the is-else statement</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (quantity <span class="sc">&gt;</span> <span class="dv">20</span>) {</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">'You sold a lot!'</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">'Not enough for today'</span>)  </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="do">## else if ####</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create vector quantiy</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>quantity <span class="ot">&lt;-</span>  <span class="dv">10</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Create multiple condition statement</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (quantity <span class="sc">&lt;</span><span class="dv">20</span>) {</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">'Not enough for today'</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (quantity <span class="sc">&gt;</span> <span class="dv">20</span>  <span class="sc">&amp;</span>quantity <span class="sc">&lt;=</span> <span class="dv">30</span>) {</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">'Average day'</span>)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">'What a great day!'</span>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>category <span class="ot">&lt;-</span> <span class="st">'A'</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>price <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (category <span class="sc">==</span><span class="st">'A'</span>){</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">'A vat rate of 8% is applied.'</span>,<span class="st">'The total price is'</span>,price <span class="sc">*</span><span class="fl">1.08</span>)  </span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (category <span class="sc">==</span><span class="st">'B'</span>){</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">'A vat rate of 10% is applied.'</span>,<span class="st">'The total price is'</span>,price <span class="sc">*</span><span class="fl">1.10</span>)  </span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">'A vat rate of 20% is applied.'</span>,<span class="st">'The total price is'</span>,price <span class="sc">*</span><span class="fl">1.20</span>)  </span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="iii.-for-while" class="level4">
+<h4 class="anchored" data-anchor-id="iii.-for-while">iii. for / while</h4>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. for ####</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create fruit vector</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>fruit <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'Apple'</span>, <span class="st">'Orange'</span>, <span class="st">'Passion fruit'</span>, <span class="st">'Banana'</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the for statement</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> fruit) { </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(i)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an empty list</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>list <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a for statement to populate the list</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="at">by=</span><span class="dv">1</span>)) {</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  list[[i]] <span class="ot">&lt;-</span> i<span class="sc">*</span>i</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(list)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 8. while ####</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a variable with value 1</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>begin <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the loop</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (begin <span class="sc">&lt;=</span> <span class="dv">10</span>){</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># See which we are  </span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">'This is loop number'</span>,begin)</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># add 1 to the variable begin after each loop</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  begin <span class="ot">&lt;-</span> begin<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(begin)</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Set variable stock and price</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>stock <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>price <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop variable counts the number of loops </span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>loop <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the while statement</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> (price <span class="sc">&gt;</span> <span class="dv">45</span>){</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a random price between 40 and 60</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>  price <span class="ot">&lt;-</span> stock <span class="sc">+</span> <span class="fu">sample</span>(<span class="sc">-</span><span class="dv">10</span><span class="sc">:</span><span class="dv">10</span>, <span class="dv">1</span>)</span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(loop)</span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(price)</span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Count the number of loop</span></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a>  loop <span class="ot">=</span> loop <span class="sc">+</span><span class="dv">1</span> </span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="iv.-apply-family" class="level4">
+<h4 class="anchored" data-anchor-id="iv.-apply-family">iv. apply family</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Input</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>apply(x, MARGIN, FUN)</code></td>
+<td>df / matrix</td>
+<td>vector, list, array</td>
+</tr>
+<tr class="even">
+<td><code>lapply(X, FUN)</code></td>
+<td>list, vector, df</td>
+<td>list</td>
+</tr>
+<tr class="odd">
+<td><code>sapply(X, FUN)</code></td>
+<td>list, vector, df</td>
+<td>vector / matrix</td>
+</tr>
+<tr class="even">
+<td><code>tapply(X, INDEX, FUN)</code></td>
+<td>vector + factor</td>
+<td>measure</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">nrow =</span> <span class="dv">5</span>, <span class="at">ncol =</span> <span class="dv">6</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>m1</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># apply: row-wise sum</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(m1, <span class="dv">1</span>, sum)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># apply: column-wise sum</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(m1, <span class="dv">2</span>, sum)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># lapply: uppercase → lowercase</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>movies <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"SPYDERMAN"</span>, <span class="st">"BATMAN"</span>, <span class="st">"VERTIGO"</span>, <span class="st">"CHINATOWN"</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(movies, tolower)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co"># sapply: returns a vector</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cars)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(cars, min)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co"># tapply: group-wise summary</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(iris)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(iris<span class="sc">$</span>Sepal.Width, iris<span class="sc">$</span>Species, median)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="packages" class="level3">
+<h3 class="anchored" data-anchor-id="packages">④ Packages</h3>
+<p>a collection of pre-defined, reusable functions</p>
+<section id="cran" class="level4">
+<h4 class="anchored" data-anchor-id="cran">CRAN</h4>
+<blockquote class="blockquote">
+<p>official app store</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 9. packages ####</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 패키지 = 다른 사람이 만든 함수 모음 (앱스토어의 앱과 비슷)</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("패키지이름")  → 한 번만 하면 됨</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># library(패키지이름)             → 매번 R 시작할 때마다 해야 함</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'package_name'</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 오늘 사용할 패키지 설치 (처음 한 번만!)</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"tidyverse"</span>))   <span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 패키지 로드</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)    <span class="co"># dplyr, ggplot2 등 포함</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Pipe 연산자 %&gt;% (chain) ####</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co"># "그리고 나서" 라고 읽으면 됩니다</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 단축키: Ctrl + Shift + M</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 기존 방식</span></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(patients, <span class="dv">3</span>)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Pipe 방식 (같은 결과)</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>patients <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">3</span>)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 여러 작업을 연결할 때 강력함</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>patients <span class="sc">%&gt;%</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gender <span class="sc">==</span> <span class="st">"M"</span>) <span class="sc">%&gt;%</span>   <span class="co"># 남성만 골라서</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(pt_id, height) <span class="sc">%&gt;%</span>   <span class="co"># id와 키만 선택해서</span></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(height))       <span class="co"># 키 내림차순 정렬</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="bioconductor" class="level4">
+<h4 class="anchored" data-anchor-id="bioconductor">Bioconductor</h4>
+<blockquote class="blockquote">
+<p>for omics analysis</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"DESeq2"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager가 없으면 먼저 설치</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"BiocManager"</span>)) <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 오늘 사용할 패키지 설치 (처음 한 번만!)</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"DESeq2"</span>))      BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"DESeq2"</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 패키지 로드</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="working-directory-file-io" class="level3">
+<h3 class="anchored" data-anchor-id="working-directory-file-io">⑤ Working Directory &amp; File I/O</h3>
+<section id="working-directory" class="level4">
+<h4 class="anchored" data-anchor-id="working-directory">Working Directory</h4>
+<p>your current folder where R can read and write files</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/wd.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check the current working directory </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># change your working directory </span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">'C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">USER</span><span class="sc">\\</span><span class="st">BI_for_MD_PhD_KNUmed'</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># dir.create("your_path") # create directory</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co"># dir.exists("your_path") # check if the directory exists</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="r-project-.rproj" class="level4">
+<h4 class="anchored" data-anchor-id="r-project-.rproj">R Project (.Rproj)</h4>
+<blockquote class="blockquote">
+<p>R env file to fix your working directory</p>
+</blockquote>
+<pre><code>RStudio → File → New Project → New Directory (or Existing Directory)</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/R_pro.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><code>setwd()</code></th>
+<th>R Project</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>path compatibility</td>
+<td>❌ only in your computer … need hard coding</td>
+<td>✅wherever</td>
+</tr>
+<tr class="even">
+<td>reproducibility</td>
+<td>❌ low</td>
+<td>✅ high</td>
+</tr>
+<tr class="odd">
+<td>cowork, git</td>
+<td>❌ hard</td>
+<td>✅ easy</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><strong>recommended structure of folders</strong></p>
+<pre><code>my_project/
+├── my_project.Rproj  ← setting working directory where this file exists
+├── scripts/          ← R scripts (.R)
+│   ├── 1_table1.R
+│   ├── 2_preprocessing.R
+│   └── 3_figure.R
+├── rawdata/          ← raw data (never change)
+│   └── clinical_data.xlsx
+├── analysis/         ← preprocessed data
+│   ├── 1_cleaned_data.rds
+│   ├── 1_df_pt.rds
+│   ├── 1_table1.rds
+│   ├── 2_df_pt_processed.rds
+│   ├── 3_cox_model.rds
+│   ├── 3_cox_tidy.rds
+└── results/          ← final results
+│   ├── Table1.docx
+│   ├── KM_OS.tiff
+│   └── forest_OS.tiff
+└── logs/ or docs/     ← whatever</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/folder_structure.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+<section id="file-read-write" class="level4">
+<h4 class="anchored" data-anchor-id="file-read-write">File Read &amp; Write</h4>
+<section id="csv-tsv" class="level5">
+<h5 class="anchored" data-anchor-id="csv-tsv">CSV / TSV</h5>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Read ---</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># CSV (Comma-Separated Values)</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"examples/data/part1/my_data.csv"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># TSV (Tab-Separated Values)</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">"examples/data/part1/my_data.csv"</span>, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># readr/bigreadr: faster and more options (recommended)</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"examples/data/part1/my_data.csv"</span>)    <span class="co"># CSV</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"examples/data/part1/my_data.tsv"</span>)    <span class="co"># TSV</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Write ---</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(df, <span class="st">"examples/analysis/w2_my_data.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(df, <span class="st">"examples/analysis/w2_my_data.csv"</span>) </span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">write_tsv</span>(df, <span class="st">"examples/analysis/w2_my_data.tsv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="excel" class="level5">
+<h5 class="anchored" data-anchor-id="excel">Excel</h5>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># set sheet</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"examples/data/part1/my_data.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Sheet1"</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># set range</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"examples/data/part1/my_data.xlsx"</span>, <span class="at">range =</span> <span class="st">"A1:D50"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>read.csv</code> vs <code>read_csv</code></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><code>read.csv</code> (base R)</th>
+<th><code>read_csv</code> (readr)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>speed</td>
+<td>normal</td>
+<td>fast (better for large-scale data)</td>
+</tr>
+<tr class="even">
+<td>character column</td>
+<td>automatically convert to factor</td>
+<td>keep character</td>
+</tr>
+<tr class="odd">
+<td>output</td>
+<td>data.frame</td>
+<td>tibble</td>
+</tr>
+<tr class="even">
+<td>when recommended</td>
+<td>simple task</td>
+<td>real analysis (?)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="rds-r-data-serialization" class="level4">
+<h4 class="anchored" data-anchor-id="rds-r-data-serialization">RDS (R Data Serialization)</h4>
+<blockquote class="blockquote">
+<p>for saving data (R objects; list, results, …) in R</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save your data</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(df, <span class="st">"examples/analysis/w2_my_data.rds"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># load your data</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>df_loaded <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"examples/analysis/w2_my_data.rds"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 모델 결과 저장 예시</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(fit, <span class="st">"examples/analysis/w2_linear_model.rds"</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>fit_loaded <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"examples/analysis/w2_linear_model.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>when <strong><code>rds</code></strong> helps</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 57%">
+<col style="width: 42%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>when</th>
+<th>recommended format</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sharing your data</td>
+<td><code>.csv</code> / <code>.tsv</code></td>
+</tr>
+<tr class="even">
+<td>re-use after pre-processing of data</td>
+<td><code>.rds</code></td>
+</tr>
+<tr class="odd">
+<td>for large-scale data, list, model results</td>
+<td><code>.rds</code></td>
+</tr>
+<tr class="even">
+<td>for multiple R data</td>
+<td><code>.RData</code> (<code>save()</code> / <code>load()</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df, fit, <span class="at">file =</span> <span class="st">"examples/analysis/w2_my_workspace.RData"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"examples/analysis/w2_my_workspace.RData"</span>)  <span class="co"># df, fit</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+</section>
+<section id="practice-basic-programming-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="practice-basic-programming-in-r">3) Practice | basic programming in R</h2>
+<ul>
+<li>make a variable ‘my_info’ with your age and height</li>
+<li>Install ‘dplyr’ and ‘ggplot2’ using <code>install.packages()</code></li>
+<li>Make a dataframe‘team_data’ with three columns (name, age, specialty) using information of three colleagues of yours</li>
+<li>From the ‘team_data’, extract ‘specialty’ using $</li>
+<li>From the ‘team_data’, extract the information of the second person using [,]</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="bulk-rna-seq-data" class="level1">
+<h1>4. Bulk RNA-seq Data</h1>
+<blockquote class="blockquote">
+<p>GEO/TCGA는 ③까지 완료된 count matrix를 제공합니다. 우리는 ④부터 시작!</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/where_to_start.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<section id="details-in-pre-processing-of-rna-seq-data" class="level2">
+<h2 class="anchored" data-anchor-id="details-in-pre-processing-of-rna-seq-data">1) details in pre-processing of RNA-seq data</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/preprocess.png" class="img-fluid figure-img"></p>
+<figcaption>Conesa et al., A survey of best practices for RNA-seq data analysis, Genome Biol., 2016</figcaption>
+</figure>
+</div>
+</section>
+<section id="normalization" class="level2">
+<h2 class="anchored" data-anchor-id="normalization">2) Normalization</h2>
+<section id="why-normalization-is-needed" class="level3">
+<h3 class="anchored" data-anchor-id="why-normalization-is-needed">Why Normalization is Needed</h3>
+<blockquote class="blockquote">
+<p>for sample comparison</p>
+</blockquote>
+<ul>
+<li><strong>Library size (depth)</strong>: higher sequencing depth → higher counts</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/norm_library.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<ul>
+<li><strong>Gene length</strong>: longer genes → higher counts</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/norm_len.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+<section id="standard-normalization-methods-for-rna-seq-tmm-rle" class="level3">
+<h3 class="anchored" data-anchor-id="standard-normalization-methods-for-rna-seq-tmm-rle">standard normalization methods for RNA-seq: TMM &amp; RLE</h3>
+<ul>
+<li><strong>TMM</strong>: selects a reference sample, trims extreme values, and normalizes based on a set of <u>housekeeping genes</u></li>
+<li><strong>RLE</strong>: uses the median ratio of each gene relative to its geometric mean across samples as the size factor</li>
+<li><strong>Normalization factor</strong> (edgeR) / <strong>Size factor</strong> (DESeq2): library size 🔼→ counts 🔽</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/TMM_RLE.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+<section id="normalization-methods-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="normalization-methods-comparison">Normalization Methods Comparison</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Correction</th>
+<th>Comparison</th>
+<th>Remarks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Raw Count</td>
+<td>×</td>
+<td>×</td>
+<td>edgeR/DESeq2 input</td>
+</tr>
+<tr class="even">
+<td>RPKM/FPKM</td>
+<td>Depth + Length</td>
+<td>Intra-sample</td>
+<td>Deprecated</td>
+</tr>
+<tr class="odd">
+<td>TPM</td>
+<td>Depth + Length</td>
+<td>Intra + Inter-sample</td>
+<td>per-sample sum = 1M</td>
+</tr>
+<tr class="even">
+<td>CPM</td>
+<td>Depth</td>
+<td>Inter-sample</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>TMM/RLE</td>
+<td>Depth + Composition</td>
+<td>Inter-sample</td>
+<td>Standard for DEG analysis</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="practice-normalization" class="level2">
+<h2 class="anchored" data-anchor-id="practice-normalization">3) Practice | normalization</h2>
+<section id="raw-counts-fake" class="level3">
+<h3 class="anchored" data-anchor-id="raw-counts-fake">① raw counts (fake)</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"tidyverse"</span>)) <span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"edgeR"</span>)) BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"edgeR"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"DESeq2"</span>)) BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"DESeq2"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 라이브러리 로드</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(edgeR)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># set the wd or open your R proj</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"T:/homes/eha/교육/[학부] 4-1 분자의학 선택연구/2026/"</span>)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. creating example data ####</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 1-1. fake 1000 genes, 6 samples ####</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>n_genes <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>sample_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">"Ctrl_"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>), <span class="fu">paste0</span>(<span class="st">"Treat_"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>))</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>sample_names</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>gene_names <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Gene_"</span>, <span class="dv">1</span><span class="sc">:</span>n_genes)</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gene_names)</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 1-2. creating Raw Count Matrix (Negative Binomial distribution) ####</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="fu">rnorm</span>(<span class="dv">10</span>,<span class="at">mean=</span><span class="dv">0</span>,<span class="at">sd=</span><span class="dv">1</span>) <span class="co"># making mock data</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>,<span class="at">mean=</span><span class="dv">0</span>,<span class="at">sd=</span><span class="dv">1</span>)</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x); <span class="fu">sd</span>(x)</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a><span class="fu">rbinom</span>(); <span class="fu">rpois</span>(); <span class="fu">rbeta</span>()</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>raw_counts <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnbinom</span>(n_genes <span class="sc">*</span> n_samples, <span class="co"># total 1000*6 values</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>                             <span class="at">mu =</span> <span class="dv">100</span>, <span class="at">size =</span> <span class="dv">5</span>), <span class="co"># mean: 100, dispersion: 5</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>                     <span class="at">nrow =</span> n_genes <span class="co"># making 1000 genes</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>                     )</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw_counts)</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a><span class="do">### varying Library Size(Sequencing depth) ####</span></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>raw_counts[, <span class="dv">4</span><span class="sc">:</span><span class="dv">6</span>] <span class="ot">&lt;-</span> raw_counts[, <span class="dv">4</span><span class="sc">:</span><span class="dv">6</span>] <span class="sc">*</span> <span class="dv">3</span></span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw_counts)</span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(raw_counts) <span class="ot">&lt;-</span> sample_names</span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(raw_counts) <span class="ot">&lt;-</span> gene_names</span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw_counts)</span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="do">## 1-3. Gene Length in bp (for RPKM, TPM) ####</span></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a>gene_lengths <span class="ot">&lt;-</span> <span class="fu">round</span>(<span class="fu">runif</span>(n_genes, <span class="at">min =</span> <span class="dv">200</span>, <span class="at">max =</span> <span class="dv">5000</span>))</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gene_lengths)</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(gene_lengths)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="cpm-counts-per-million" class="level3">
+<h3 class="anchored" data-anchor-id="cpm-counts-per-million">② CPM (counts per million)</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. CPM (counts per million) ####</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="do">## library size: Total Counts per sample </span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>lib_sizes <span class="ot">&lt;-</span> <span class="fu">colSums</span>(raw_counts)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>lib_sizes</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="do">## calculating CPM</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>prop_counts <span class="ot">&lt;-</span> <span class="fu">sweep</span>(raw_counts, </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">MARGIN =</span> <span class="dv">2</span>, <span class="co"># 1: by row(gene), 2: by column(sample)</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">STATS =</span> lib_sizes, </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">FUN =</span> <span class="st">"/"</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>                     )</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw_counts)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(prop_counts)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>lib_sizes</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>cpm_counts <span class="ot">&lt;-</span> prop_counts <span class="sc">*</span> <span class="fl">1e6</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cpm_counts)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="rpkm-reads-per-killobase-million" class="level3">
+<h3 class="anchored" data-anchor-id="rpkm-reads-per-killobase-million">③ RPKM (reads per killobase million)</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. RPKM (reads per killobase million) ####</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="do">## gene length (kb)</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>kb_lengths <span class="ot">&lt;-</span> gene_lengths <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(kb_lengths)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="do">## calculating RPKM</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3-1. correcting for gene length (RPK) ####</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>rpk <span class="ot">&lt;-</span> <span class="fu">sweep</span>(raw_counts, </span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">MARGIN =</span> <span class="dv">1</span>, <span class="co"># 1: by row(gene)</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">STATS =</span> kb_lengths, </span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">FUN =</span> <span class="st">"/"</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rpk)</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 3-2. correcting for Library Size (million-based) (RPKM) ####</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>rpkm_counts <span class="ot">&lt;-</span> <span class="fu">sweep</span>(rpk, </span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">MARGIN =</span> <span class="dv">2</span>, <span class="co"># 1: by column(sample)</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>                     <span class="at">STATS =</span> lib_sizes, </span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">FUN =</span> <span class="st">"/"</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>                     )<span class="sc">*</span><span class="fl">1e6</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rpkm_counts)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="tpm-transcripts-per-million" class="level3">
+<h3 class="anchored" data-anchor-id="tpm-transcripts-per-million">④ TPM (transcripts per million)</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. TPM (transcripts per million) ####</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 4-1. RPK (Reads Per Kilobase) ####</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>rpk <span class="ot">&lt;-</span> <span class="fu">sweep</span>(raw_counts, <span class="dv">1</span>, kb_lengths, <span class="st">"/"</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 4-2. per-sample RPK ####</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>rpk_sums <span class="ot">&lt;-</span> <span class="fu">colSums</span>(rpk)</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rpk_sums)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 4-3. calculating TPM (correcting for per-sample RPK) ####</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>tpm_counts <span class="ot">&lt;-</span> <span class="fu">sweep</span>(rpk, </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">MARGIN =</span> <span class="dv">2</span>, </span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">STATS =</span> rpk_sums, <span class="co"># instead of library size</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">FUN =</span> <span class="st">"/"</span>)<span class="sc">*</span><span class="fl">1e6</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="do">## check: TPM sum = 1M</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(tpm_counts)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="tmm-from-edger" class="level3">
+<h3 class="anchored" data-anchor-id="tmm-from-edger">⑤ TMM from edgeR</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. TMM from edgeR ####</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 5-1. make edgeR object (DGEList) ####</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> <span class="fu">DGEList</span>(<span class="at">counts =</span> raw_counts)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>dge</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dge)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 5-2. make Normalization Factor from TMM ####</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>dge2 <span class="ot">&lt;-</span> <span class="fu">calcNormFactors</span>(dge, <span class="at">method =</span> <span class="st">"TMM"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dge2)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>dge2<span class="sc">@</span>.Data[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> head</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>dge<span class="sc">@</span>.Data[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> head</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>dge2 <span class="ot">&lt;-</span> <span class="fu">calcNormFactors</span>(dge, <span class="at">method =</span> <span class="st">"TMM"</span>, </span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">refColumn=</span><span class="dv">3</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">logratioTrim=</span><span class="fl">0.4</span>,</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">sumTrim=</span><span class="dv">0</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>dge2<span class="sc">@</span>.Data[[<span class="dv">2</span>]] <span class="sc">%&gt;%</span> head</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 5-3. normalizing counts (CPM, but using TMM factor) ####</span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>tmm_counts <span class="ot">&lt;-</span> <span class="fu">cpm</span>(dge2, <span class="at">normalized.lib.sizes =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tmm_counts)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>cpm_counts2 <span class="ot">&lt;-</span> <span class="fu">cpm</span>(dge2, <span class="at">normalized.lib.sizes =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cpm_counts2)</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cpm_counts)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="rle-from-deseq2" class="level3">
+<h3 class="anchored" data-anchor-id="rle-from-deseq2">⑥ RLE from DESeq2</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. RLE from DESeq2 ####</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 6-1. metadata for DESeq2 object ####</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>colData <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">condition =</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Ctrl"</span>, <span class="st">"Treat"</span>), <span class="at">each =</span> <span class="dv">3</span>)))</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>colData</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(colData) <span class="ot">&lt;-</span> sample_names</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>colData</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw_counts)</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 6-2. make DESeqDataSet (dds) ####</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromMatrix</span>(<span class="at">countData =</span> raw_counts, </span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>                              <span class="at">colData =</span> colData, </span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>                              <span class="at">design =</span> <span class="sc">~</span> condition)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>dds</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dds)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 6-3. estimating Size Factor ####</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>dds2 <span class="ot">&lt;-</span> <span class="fu">estimateSizeFactors</span>(dds)</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>dds2 <span class="co"># creating sizeFactor in colData</span></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>dds2<span class="sc">@</span>colData</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 6-4. normalized counts ####</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>deseq_counts <span class="ot">&lt;-</span> <span class="fu">counts</span>(dds2, <span class="at">normalized =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(deseq_counts)</span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>raw_counts2 <span class="ot">&lt;-</span> <span class="fu">counts</span>(dds2, <span class="at">normalized =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw_counts2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+<section id="visualization" class="level3">
+<h3 class="anchored" data-anchor-id="visualization">⑦ visualization</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. visualization ####</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 7-1. reshaping counts (Long format for ggplot) ####</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>transform_to_long <span class="ot">&lt;-</span> <span class="cf">function</span>(count_matrix, method_name) {</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(count_matrix) <span class="sc">%&gt;%</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rownames_to_column</span>(<span class="st">"Gene"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="sc">-</span>Gene, <span class="at">names_to =</span> <span class="st">"Sample"</span>, <span class="at">values_to =</span> <span class="st">"Count"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Method =</span> method_name,</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>           <span class="co"># Log2 transformation (pseudocount: +1 for 0)</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">LogCount =</span> <span class="fu">log2</span>(Count <span class="sc">+</span> <span class="dv">1</span>))</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="do">## applying the function ####</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_to_long</span>(raw_counts, <span class="st">"1. Raw"</span>) <span class="sc">%&gt;%</span> head</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="fu">transform_to_long</span>(cpm_counts, <span class="st">"2. CPM"</span>) <span class="sc">%&gt;%</span> head</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>df_all <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform_to_long</span>(raw_counts, <span class="st">"1. Raw"</span>),</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform_to_long</span>(cpm_counts, <span class="st">"2. CPM"</span>),</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform_to_long</span>(rpkm_counts, <span class="st">"3. RPKM"</span>),</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform_to_long</span>(tpm_counts, <span class="st">"4. TPM"</span>),</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform_to_long</span>(tmm_counts, <span class="st">"5. TMM (edgeR)"</span>),</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform_to_long</span>(deseq_counts, <span class="st">"6. DESeq2"</span>)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_all)</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(df_all)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 7-2. visualization (Boxplot) ####</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>df_all <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Sample, <span class="at">y =</span> LogCount, <span class="at">fill =</span> Sample)) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># box plot</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot by method</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Method, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span> </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># theme</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># x-axis text</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># plot title</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Normalization Method Comparison"</span>,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Log2(Counts + 1)"</span>,</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/normalization_box.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">➕ references</h2>
+<section id="ngs-2" class="level3">
+<h3 class="anchored" data-anchor-id="ngs-2">NGS</h3>
+<p><a href="https://www.illumina.com/ko-kr/science/technology/next-generation-sequencing/beginners/advantages/ngs-vs-sanger.html">NGS vs.&nbsp;Sanger</a><br>
+<a href="https://youtu.be/7AHTXT4Y4rU">NGS Instead of Sanger Sequencing</a><br>
+<a href="https://www.youtube.com/watch?v=CZeN-IgjYCo">NGS introductioin</a><br>
+<a href="https://www.youtube.com/watch?v=fCd6B5HRaZ8">Sequencing by Synthesis</a></p>
+</section>
+<section id="omics-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="omics-data-1">Omics data</h3>
+<p><a href="https://en.wikipedia.org/wiki/FASTQ_format">FASTQ</a><br>
+<a href="https://en.wikipedia.org/wiki/Phred_quality_score">Phred score</a><br>
+<a href="https://www.genome.gov/about-genomics/fact-sheets/DNA-Sequencing-Costs-Data">cost of DNA-seq</a></p>
+</section>
+<section id="rna-seq" class="level3">
+<h3 class="anchored" data-anchor-id="rna-seq">RNA-seq</h3>
+<p><a href="https://www.illumina.com/techniques/sequencing/ngs-library-prep/rna.html">RNA-seq workflow</a><br>
+<a href="https://www.illumina.com/products/by-type/sequencing-kits/library-prep-kits/stranded-total-rna-prep.html">RNA library prep (illumina)</a> <a href="https://hhj6212.github.io/biology/tech/2020/08/26/Bioinformatics-fileformats.html">SAM/BAM</a> <a href="https://academic.oup.com/bib/article/14/6/671/189645">Normalization comparison</a></p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<!-- AI Chat Widget 초기화 -->
+
+<!-- _quarto.yml의 include-after-body에 등록되어 모든 페이지에 자동 삽입됩니다 -->
+
+<script>
+
+  // ★ Cloudflare Worker 배포 후 URL로 교체하세요
+
+  const WORKER_URL = "https://falling-wave-447f.eh0129s.workers.dev/";
+
+
+
+  // 각 .qmd 파일의 YAML에서 ai-context를 읽어옵니다
+
+  // (없으면 빈 문자열 → 기본 안내 메시지)
+
+  const metaContext = document.querySelector('meta[name="ai-context"]');
+
+  const metaTitle   = document.querySelector('meta[name="ai-title"]') || { content: document.title };
+
+
+
+  window.AI_CHAT_CONFIG = {
+
+    workerUrl:      WORKER_URL,
+
+    chapterContext: metaContext ? metaContext.content : "",
+
+    chapterTitle:   metaTitle  ? metaTitle.content   : document.title,
+
+  };
+
+</script>
+
+<!-- 위젯 코드를 인라인으로 삽입 (외부 src 제거 → 페이지 깊이에 따른 경로 404 방지) -->
+
+<script>
+
+/**
+
+ * AI Chat Widget for Quarto
+
+ * 각 페이지의 YAML front matter에서 시스템 프롬프트를 읽어옵니다.
+
+ * window.AI_CHAT_CONFIG 에서 설정을 가져옵니다.
+
+ */
+
+
+
+(function () {
+
+  const cfg = window.AI_CHAT_CONFIG || {};
+
+  const WORKER_URL = cfg.workerUrl || "";
+
+  const CHAPTER_CONTEXT = cfg.chapterContext || "";
+
+  const CHAPTER_TITLE = cfg.chapterTitle || document.title;
+
+
+
+  if (!WORKER_URL) {
+
+    console.warn("[AI Chat] workerUrl이 설정되지 않았습니다.");
+
+    return;
+
+  }
+
+
+
+  /* ── 시스템 프롬프트 ───────────────────────── */
+
+  const SYSTEM_PROMPT = `당신은 "${CHAPTER_TITLE}" 강의자료를 도와주는 학습 도우미입니다.
+
+
+
+아래는 현재 챕터의 핵심 내용입니다:
+
+---
+
+${CHAPTER_CONTEXT}
+
+---
+
+
+
+규칙:
+
+- 위 챕터 내용을 중심으로 답변하세요.
+
+- 질문이 챕터 범위를 벗어나면 간단히 언급하고 챕터 내용으로 연결해주세요.
+
+- R 코드 예시가 도움이 될 때는 포함하세요.
+
+- 한국어로 답변하되, 전문 용어는 영어 병기 가능합니다.
+
+- 의학/과학 학생 대상이므로 정확성을 최우선으로 합니다.`;
+
+
+
+  /* ── DOM 생성 ────────────────────────────── */
+
+  const style = document.createElement("style");
+
+  style.textContent = `
+
+    #ai-chat-fab {
+
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+
+      width: 52px; height: 52px; border-radius: 50%;
+
+      background: #1a6e3c; color: #fff; border: none;
+
+      box-shadow: 0 4px 16px rgba(0,0,0,.22);
+
+      cursor: pointer; font-size: 22px;
+
+      display: flex; align-items: center; justify-content: center;
+
+      transition: background .2s, transform .15s;
+
+    }
+
+    #ai-chat-fab:hover { background: #155730; transform: scale(1.07); }
+
+
+
+    #ai-chat-panel {
+
+      position: fixed; bottom: 90px; right: 28px; z-index: 9998;
+
+      width: 360px; max-width: calc(100vw - 40px);
+
+      height: 500px; max-height: calc(100vh - 120px);
+
+      background: #fff; border-radius: 16px;
+
+      box-shadow: 0 8px 40px rgba(0,0,0,.18);
+
+      display: flex; flex-direction: column;
+
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+
+      overflow: hidden;
+
+      transform: scale(.92) translateY(12px);
+
+      opacity: 0; pointer-events: none;
+
+      transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .18s;
+
+    }
+
+    #ai-chat-panel.open {
+
+      transform: scale(1) translateY(0);
+
+      opacity: 1; pointer-events: all;
+
+    }
+
+
+
+    #ai-chat-header {
+
+      background: #1a6e3c; color: #fff;
+
+      padding: 14px 16px 12px;
+
+      display: flex; align-items: center; gap: 10px;
+
+      font-size: 14px; font-weight: 600; letter-spacing: .01em;
+
+      flex-shrink: 0;
+
+    }
+
+    #ai-chat-header span { flex: 1; }
+
+    #ai-chat-close {
+
+      background: none; border: none; color: #fff;
+
+      font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
+
+      opacity: .8;
+
+    }
+
+    #ai-chat-close:hover { opacity: 1; }
+
+
+
+    #ai-chat-subtitle {
+
+      font-size: 11px; color: rgba(255,255,255,.72);
+
+      font-weight: 400; display: block; margin-top: 2px;
+
+    }
+
+
+
+    #ai-chat-messages {
+
+      flex: 1; overflow-y: auto; padding: 14px 14px 8px;
+
+      display: flex; flex-direction: column; gap: 10px;
+
+      scroll-behavior: smooth;
+
+    }
+
+    #ai-chat-messages::-webkit-scrollbar { width: 4px; }
+
+    #ai-chat-messages::-webkit-scrollbar-thumb {
+
+      background: #ddd; border-radius: 4px;
+
+    }
+
+
+
+    .ai-msg {
+
+      max-width: 88%; padding: 9px 13px;
+
+      border-radius: 14px; font-size: 13.5px; line-height: 1.55;
+
+      white-space: pre-wrap; word-break: break-word;
+
+    }
+
+    .ai-msg.user {
+
+      align-self: flex-end;
+
+      background: #1a6e3c; color: #fff;
+
+      border-bottom-right-radius: 4px;
+
+    }
+
+    .ai-msg.assistant {
+
+      align-self: flex-start;
+
+      background: #f3f4f6; color: #1f2937;
+
+      border-bottom-left-radius: 4px;
+
+    }
+
+    .ai-msg.assistant code {
+
+      background: #e5e7eb; padding: 1px 5px;
+
+      border-radius: 4px; font-size: 12.5px; font-family: monospace;
+
+    }
+
+    .ai-msg.assistant pre {
+
+      background: #1f2937; color: #f9fafb;
+
+      padding: 10px 12px; border-radius: 8px; overflow-x: auto;
+
+      font-size: 12px; margin: 6px 0;
+
+    }
+
+    .ai-msg.assistant pre code { background: none; padding: 0; color: inherit; }
+
+
+
+    .ai-typing {
+
+      align-self: flex-start;
+
+      display: flex; gap: 5px; padding: 10px 14px;
+
+      background: #f3f4f6; border-radius: 14px; border-bottom-left-radius: 4px;
+
+    }
+
+    .ai-typing span {
+
+      width: 7px; height: 7px; background: #9ca3af;
+
+      border-radius: 50%; animation: aiDot 1.2s infinite;
+
+    }
+
+    .ai-typing span:nth-child(2) { animation-delay: .2s; }
+
+    .ai-typing span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes aiDot {
+
+      0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+
+      30% { transform: translateY(-5px); opacity: 1; }
+
+    }
+
+
+
+    #ai-chat-input-row {
+
+      display: flex; gap: 8px; padding: 10px 12px 12px;
+
+      border-top: 1px solid #f0f0f0; flex-shrink: 0;
+
+    }
+
+    #ai-chat-input {
+
+      flex: 1; border: 1px solid #e5e7eb; border-radius: 10px;
+
+      padding: 8px 12px; font-size: 13.5px; resize: none;
+
+      font-family: inherit; outline: none; max-height: 100px;
+
+      line-height: 1.45; color: #1f2937;
+
+      transition: border-color .15s;
+
+    }
+
+    #ai-chat-input:focus { border-color: #1a6e3c; }
+
+    #ai-chat-send {
+
+      width: 36px; height: 36px; border-radius: 9px;
+
+      background: #1a6e3c; color: #fff; border: none;
+
+      cursor: pointer; font-size: 16px; flex-shrink: 0;
+
+      align-self: flex-end;
+
+      display: flex; align-items: center; justify-content: center;
+
+      transition: background .15s;
+
+    }
+
+    #ai-chat-send:hover { background: #155730; }
+
+    #ai-chat-send:disabled { background: #9ca3af; cursor: not-allowed; }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+
+  document.body.insertAdjacentHTML("beforeend", `
+
+    <button id="ai-chat-fab" title="AI 학습 도우미">💬</button>
+
+    <div id="ai-chat-panel">
+
+      <div id="ai-chat-header">
+
+        <div>
+
+          <span>AI 학습 도우미</span>
+
+          <small id="ai-chat-subtitle">${CHAPTER_TITLE}</small>
+
+        </div>
+
+        <button id="ai-chat-close">✕</button>
+
+      </div>
+
+      <div id="ai-chat-messages">
+
+        <div class="ai-msg assistant">안녕하세요! 이 챕터에 대해 궁금한 점을 물어보세요 😊</div>
+
+      </div>
+
+      <div id="ai-chat-input-row">
+
+        <textarea id="ai-chat-input" placeholder="질문을 입력하세요… (Shift+Enter: 줄바꿈)" rows="1"></textarea>
+
+        <button id="ai-chat-send">➤</button>
+
+      </div>
+
+    </div>
+
+  `);
+
+
+
+  /* ── 상태 ─────────────────────────────────── */
+
+  const panel = document.getElementById("ai-chat-panel");
+
+  const fab = document.getElementById("ai-chat-fab");
+
+  const closeBtn = document.getElementById("ai-chat-close");
+
+  const input = document.getElementById("ai-chat-input");
+
+  const sendBtn = document.getElementById("ai-chat-send");
+
+  const messages = document.getElementById("ai-chat-messages");
+
+  const history = []; // {role, content}[]
+
+
+
+  /* ── 토글 ─────────────────────────────────── */
+
+  fab.addEventListener("click", () => {
+
+    panel.classList.toggle("open");
+
+    if (panel.classList.contains("open")) input.focus();
+
+  });
+
+  closeBtn.addEventListener("click", () => panel.classList.remove("open"));
+
+
+
+  /* ── 자동 높이 조정 ───────────────────────── */
+
+  input.addEventListener("input", () => {
+
+    input.style.height = "auto";
+
+    input.style.height = Math.min(input.scrollHeight, 100) + "px";
+
+  });
+
+
+
+  /* ── 전송 ─────────────────────────────────── */
+
+  input.addEventListener("keydown", (e) => {
+
+    if (e.key === "Enter" && !e.shiftKey) {
+
+      e.preventDefault();
+
+      sendMessage();
+
+    }
+
+  });
+
+  sendBtn.addEventListener("click", sendMessage);
+
+
+
+  function appendMsg(role, text) {
+
+    const div = document.createElement("div");
+
+    div.className = `ai-msg ${role}`;
+
+    // 간단한 코드블록 렌더링
+
+    div.innerHTML = text
+
+      .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
+
+        `<pre><code>${escHtml(code.trim())}</code></pre>`
+
+      )
+
+      .replace(/`([^`]+)`/g, (_, c) => `<code>${escHtml(c)}</code>`)
+
+      .replace(/\n/g, "<br>");
+
+    messages.appendChild(div);
+
+    messages.scrollTop = messages.scrollHeight;
+
+    return div;
+
+  }
+
+
+
+  function escHtml(s) {
+
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  }
+
+
+
+  function showTyping() {
+
+    const el = document.createElement("div");
+
+    el.className = "ai-typing";
+
+    el.innerHTML = "<span></span><span></span><span></span>";
+
+    messages.appendChild(el);
+
+    messages.scrollTop = messages.scrollHeight;
+
+    return el;
+
+  }
+
+
+
+  async function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (!text || sendBtn.disabled) return;
+
+
+
+    input.value = "";
+
+    input.style.height = "auto";
+
+    sendBtn.disabled = true;
+
+
+
+    appendMsg("user", text);
+
+    history.push({ role: "user", content: text });
+
+
+
+    const typing = showTyping();
+
+
+
+    try {
+
+      const res = await fetch(WORKER_URL, {
+
+        method: "POST",
+
+        headers: { "Content-Type": "application/json" },
+
+        body: JSON.stringify({
+
+          model: "claude-sonnet-4-6",
+
+          max_tokens: 1024,
+
+          system: SYSTEM_PROMPT,
+
+          messages: history,
+
+        }),
+
+      });
+
+
+
+      const data = await res.json();
+
+      typing.remove();
+
+
+
+      if (data.content && data.content[0]) {
+
+        const reply = data.content[0].text;
+
+        appendMsg("assistant", reply);
+
+        history.push({ role: "assistant", content: reply });
+
+      } else {
+
+        appendMsg("assistant", "오류가 발생했습니다. 다시 시도해주세요.");
+
+      }
+
+    } catch (err) {
+
+      typing.remove();
+
+      appendMsg("assistant", "네트워크 오류가 발생했습니다.");
+
+      console.error("[AI Chat]", err);
+
+    }
+
+
+
+    sendBtn.disabled = false;
+
+    input.focus();
+
+  }
+
+})();
+
+</script>
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright 2026, Eunji</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

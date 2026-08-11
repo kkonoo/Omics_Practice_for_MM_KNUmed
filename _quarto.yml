@@ -1,0 +1,79 @@
+project:
+  type: website
+  execute-dir: project
+  resources:
+    - _extensions/ai-chat/ai-chat.js
+
+website:
+  favicon: assets/img/favicon.ico
+  navbar:
+    logo: assets/img/logo.jpg
+    left:
+      - href: resources/index.qmd
+        text: Home
+      - href: resources/Day1.qmd
+        text: Day1
+      - href: resources/Day2.qmd
+        text: Day2
+          
+  page-footer:
+    left: "Copyright 2026, Eunji"
+
+format:
+  html:
+    theme:
+      light: cosmo
+    css: assets/html.css
+    toc: true
+    toc-depth: 5
+    toc-title: "Contents"
+    toc-float: true
+    page-layout: full
+
+    code-fold: false  
+    code-copy: true
+    highlight-style: github 
+
+    number-sections: false
+    smooth-scroll: true
+
+    grid:                       
+      sidebar-width: 250px
+      body-width: 1000px
+      margin-width: 350px # toc
+      gutter-width: 1.5rem
+      
+    # AI 채팅 위젯 전역 설정
+    include-after-body: assets/ai-chat-init.html
+
+  revealjs:
+    css: assets/revealjs.css    # 슬라이드용
+    scrollable: true
+
+execute:
+  freeze: true          # CI에서 R 없이 렌더: 항상 _freeze 캐시 사용 (재실행 안 함)
+  echo: true
+  eval: false
+  warning: false
+  message: false
+
+    # right:
+    #   - text: "EN"
+    #     href: en/index.qmd
+    #   - text: "KO"
+    #     href: ko/index.qmd
+
+
+  #     background: dark
+    # pdf:
+    # mainfont: "KoPubWorldDotum"
+    # mainfontoptions:
+    #   - Path=C:/Windows/Fonts/
+    #   - Extension=.ttf
+    #   - UprightFont=KoPubWorld Dotum Medium
+    #   - BoldFont=KoPubWorld Dotum Bold
+    # pdf-engine: xelatex
+    # include-in-header:
+    #   text: |
+    #     \usepackage{emoji}
+    #     \setemojifont{Segoe UI Emoji}

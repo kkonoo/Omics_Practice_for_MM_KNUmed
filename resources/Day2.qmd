@@ -1,0 +1,940 @@
+---
+title: "오믹스 데이터 분석 기술 Day 1"
+subtitle: "의학과 4학년 1학기 - 분자의학 선택연구"
+author: "하은지 (분자의학교실)"
+date: last-modified
+format:
+  html
+execute:
+  echo: true
+  eval: false
+---
+
+# Today's lecture
+
+![](/assets/img/day2.png){fig-align="center"}
+
+# 1. EDA (explantory data analysis)
+
+## 1) why do we need EDA?
+
+Visualize data [before statistical analysis]{.underline} to **understand its overall characteristics and quality**
+
+-   **Quality Control**: identify outlier samples
+-   **Batch Effect Detection**: check whether technical noise (experiment date, instrument, etc.) is masking biological signal
+-   **Heteroscedasticity**: variance increases with expression level → a small number of highly expressed genes can dominate the entire analysis
+
+------------------------------------------------------------------------
+
+## 2) Data Transformation: vst vs. rlog
+
+we need to transform our data (RNA-seq data) for statistic analyses
+
+![](/assets/img/DEG/trans.png){fig-align="center"}
+
+💡 vst/rlog transformed values are **for visualization only**; raw counts must be used for differential analysis!
+
+------------------------------------------------------------------------
+
+### ① vst
+
+> Variance Stabilizing Transformation
+
+::::: columns
+::: {.column width="50%"}
+-   Suitable for n ≥ 30 (large sample sizes)
+-   Based on a global trend → fast
+-   `asinh` transformation for highly-expressed genes
+:::
+
+::: {.column width="50%"}
+![](/assets/img/DEG/vst.png){fig-align="center"}
+:::
+:::::
+
+------------------------------------------------------------------------
+
+### ② rlog
+
+> regularized Log
+
+::::: columns
+::: {.column width="50%"}
+-   Suitable for n \< 30 (small sample sizes)
+-   Per-gene shrinkage (Bayesian estimation) → slow
+-   Suppresses noise in low-count genes
+:::
+
+::: {.column width="50%"}
+![](/assets/img/DEG/rlog.png){fig-align="center"}
+:::
+:::::
+
+💡 Imagine this
+
+```         
+gene A (low):
+sample 1: 1, sample 2: 5 ➡️ logFC = log2(5/1) = 2.32 … noise ↑
+
+gene B (high):
+sample 1: 1000, sample 2: 1004 ➡️ logFC = log2(1004/1000) = 0.005 … noise ↓ (stabilized)
+```
+
+------------------------------------------------------------------------
+
+### ③ Practice \| DESeq2::vst()
+
+> download practice data and save the following files in `data/` in your R project
+
+| File | Link |
+|-------------------------|-----------------------------------------------|
+| `0_raw_counts_final.rds` | [📥 Download](https://drive.google.com/file/d/1y6rBloxvp5c4iYr7AVqVjUrpgZiBaSXR/view?usp=drive_link) |
+| `0_meta_data_final.rds` | [📥 Download](https://drive.google.com/file/d/1-vi09nduyHYfKIGTWkfdvcRVyzIh3WED/view?usp=drive_link) |
+| `1_1_dds.rds` | [📥 Download](https://drive.google.com/file/d/1noV8OAt2t5cbRceGDe1oUgY-nJBbxvNF/view?usp=drive_link) |
+| `1_2_dds_filtered.rds` | [📥 Download](https://drive.google.com/file/d/1pZukVok9fwXjCe-LhbD-EJ_i98g526_5/view?usp=drive_link) |
+| `1_3_vsd.rds` | [📥 Download](https://drive.google.com/file/d/1FD6KadX9vYeTMeoayBcv0ejMmaxDdQeH/view?usp=drive_link) |
+
+### i. load data (LUAD data from TCGA, n=58\*2)
+
+```{r}
+library(tidyverse)    # dplyr, ggplot2 등 포함
+library(DESeq2)
+
+# set your wd or open your R project
+setwd("T:/homes/eha/교육/[학부] 4-1 분자의학 선택연구/2026/")
+
+# 1. read data (count table and metadata) ####
+countData <- readRDS('data/0_raw_counts_final.rds')
+dim(countData)
+head(countData[,1:5])
+
+colData <- readRDS("data/0_meta_data_final.rds")
+head(colData)
+table(colData$tissue_type)
+
+# check sample ids of the count table and metadata
+all(colnames(countData) == colData$barcode) # should be TRUE
+
+# set the Factor level (condition)
+# default: alphabetical ... ref = Control/Normal
+colData$condition <- factor(colData$tissue_type, levels = c("Normal", "Tumor")) 
+colData$condition
+# case / control ... treatment / control ... KO / control
+
+
+# 2. DESeq2 object (dds) ####
+# countData, colData, design
+dds <- DESeqDataSetFromMatrix(countData = countData,
+                              colData = colData,
+                              design = ~ patient + condition) # DEG by condition
+colData$patient = gsub('-','_',colData$patient)
+dds
+saveRDS(dds, file='data/1_1_dds.rds')
+
+```
+
+### ii. pre-filtering
+
+```{r}
+# 3. Pre-filtering (de-noising) ####
+dim(counts(dds))
+
+head(counts(dds)[,1:4])
+head(counts(dds)[,1:4]>=1)
+head(rowSums(counts(dds)[,1:4]>=1))
+head(rowSums(counts(dds)>=1))
+rowSums(counts(dds)) %>% head
+
+## 3-1. lowly expressed genes (for speed-up & statistical power) ####
+### option 1: simple (Total Count < 10?) ####
+keep <- rowSums(counts(dds)) >= 10
+head(keep)
+cat(paste("   Removed", sum(!keep), "low count genes.\n"))
+cat(paste("   Remaining genes:", sum(keep), "\n"))
+dds_filtered <- dds[keep, ]
+
+### option 2: considring group size (recommended) ####
+# Total Count < 10 in the smallest group?
+# ex: Control(3), Case(10) -> non-zero counts in at least 3 samples?
+main_condition = 'condition'
+smallestGroupSize <- min(table(colData[[main_condition]]))
+smallestGroupSize*0.4
+keep <- rowSums(counts(dds) >= 1) >= (smallestGroupSize*0.5)
+cat(paste("   Removed", sum(!keep), "low count genes.\n"))
+cat(paste("   Remaining genes:", sum(keep), "\n"))
+dds_filtered <- dds[keep, ]
+
+## 3-2. confounding genes ####
+all_genes <- rownames(dds_filtered)
+head(all_genes)
+# Mitochodiral: starting with "^MT-" 
+mt_genes <- grep("^MT-", all_genes, value = TRUE)
+mt_genes
+# Ribosomal: starting with "^RPS|^RPL"
+ribo_genes <- grep("^RPS|^RPL", all_genes, value = TRUE)
+ribo_genes
+# Immunoglobulin: starting with "^IG[HKL]" : "IGH", "IGK", "IGL"
+ig_genes <- grep("^IG[HKL]", all_genes, value = TRUE)
+ig_genes
+# filtering gene list
+contam_list <- c(mt_genes, ribo_genes, ig_genes)
+length(contam_list)
+# !: 'NOT'
+keep_indices <- !(all_genes %in% contam_list)
+dds_filtered <- dds_filtered[keep_indices, ]
+dds_filtered
+
+saveRDS(dds_filtered, file='data/1_2_dds_filtered.rds')
+```
+
+### iii. data transformation
+
+```{r}
+# 4. Variance Stabilizing Transformation (vst) ####
+## 4-1. vst (normalization and transformation) ####
+vsd <- vst(dds_filtered, blind=FALSE) 
+# blind = FALSE: using design (recommended), blind=TRUE: using only technical noises
+saveRDS(vsd, file='data/1_3_vsd.rds')
+
+# check the result visually
+vsd_data = assay(vsd)
+head(vsd_data[,1:4]) # similar to log-scale
+df_vst <- data.frame(mean = rowMeans(vsd_data),
+                     sd = apply(vsd_data, 1, sd)
+                     )
+head(df_vst)
+
+ggplot(df_vst, aes(x = mean, y = sd)) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(color = "red") + # trend line
+  theme_minimal() +
+  labs(title = "Variance Stabilization Check (VST)",
+       x = "Mean Expression", y = "Standard Deviation")
+
+# no transformation
+count_data = assay(dds_filtered)
+df_count <- data.frame(mean = rowMeans(count_data),
+                       sd = apply(count_data, 1, sd)
+)
+ggplot(df_count, aes(x = mean, y = sd)) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(color = "red") + #  trend line
+  theme_minimal() +
+  labs(title = "Variance Stabilization Check (no transf)",
+       x = "Mean Expression", y = "Standard Deviation")
+
+```
+
+![](/assets/img/DEG/W6_vst_trans.png)
+
+------------------------------------------------------------------------
+
+# 3) Visual Exploration
+
+What to check through visualization:
+
+-   Is there a difference between groups?
+-   Are there any outlier samples?
+-   Is there a batch effect?
+
+![](/assets/img/DEG/EDA.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+## PCA
+
+> principal component analysis
+
+![](/assets/img/DEG/W6_PCA_theory.png){fig-align="center"}
+
+```{r}
+#| eval: false
+
+## 5-1. PCA plot ####
+pca_res <- prcomp(t(vsd_data))
+pca_res$x %>% head
+
+# PC1 and PC2
+pca_coords <- as.data.frame(pca_res$x)[,1:2]
+pca_coords %>% head
+
+ggplot(pca_coords, aes(x=PC1, y=PC2)) + 
+  geom_point(size=3) + ggtitle("PCA Result") + theme_bw()
+
+
+## 5-2. using DESeq2 function (using top 100) ####
+plotPCA(vsd, intgroup = "condition") +
+  theme_classic() +
+  labs(title = "PCA Plot")
+
+plotPCA(vsd, ntop=nrow(vsd), intgroup = "condition") +
+  theme_classic() +
+  labs(title = "PCA Plot")
+```
+
+![](/assets/img/DEG/W6_PCA.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+# 2. DEG analysis
+
+## 1) DEG
+
+> differentially expressed genes; genes whose expression levels change significantly between different conditions (e.g., Case vs. Control)
+
+![](/assets/img/DEG/W7_DEG.png){fig-align="center"}
+
+💡Not t-test!
+
+> doesn't work for RNA-seq data
+
+![](/assets/img/DEG/trans.png){fig-align="center"}
+
+## 2) linear model
+
+![](/assets/img/DEG/lm.png){fig-align="center"}
+
+::::: columns
+::: {.column width="38%"}
+![](/assets/img/DEG/W7_LM_var.png){fig-align="center" width="740"}
+:::
+
+::: {.column width="62%"}
+![](/assets/img/DEG/W7_LM.png){fig-align="center"}
+:::
+:::::
+
+------------------------------------------------------------------------
+
+### Variance decomposition
+
+> "Statistics is the process of tracing the source of variation."
+
+$$ Total Variance (RNA) = \mathbf{Condition} + \mathbf{Batch} + Residual $$
+
+![](/assets/img/DEG/var.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+## 3) statistical model of DESeq2
+
+### ① Characteristics of RNA-seq Data
+
+-   **Count data**: discrete integers including zero
+-   **Overdispersion**: variance \>\>\> mean → standard linear regression is not appropriate
+
+![](/assets/img/DEG/NB.png){fig-align="center"}
+
+-   **Negative Binomial Distribution**
+
+$$ Var(\mu) = \mu + \alpha\mu^2 $$
+
+$\mu$: mean expression (intrinsic sampling error)\
+$\alpha\mu^2$: overdispersion (variation across biological replicates)
+
+------------------------------------------------------------------------
+
+### ② GLM
+
+> Generalized Linear Model
+
+$$ \log(\mu) = \beta_0 + \beta_1(condition) + \beta_2(batch) + \cdots $$
+
+::::: columns
+::: {.column width="38%"}
+![](/assets/img/DEG/GLM.png){fig-align="center"}
+:::
+
+::: {.column width="62%"}
+![](/assets/img/DEG/GLM2.png){fig-align="center"}
+:::
+:::::
+
+------------------------------------------------------------------------
+
+### ③ Estimating Dispersion α (Shrinkage)
+
+Addresses inaccurate per-gene α estimation in small samples (e.g., n=3):
+
+1.  **Gene-wise**: calculate the raw dispersion for each gene
+2.  **Trend line**: fit a global trend line across all genes
+3.  **Shrink**: pull noisy estimates toward the trend line → improved accuracy, reduced false positives
+
+![](/assets/img/DEG/W7_dispersion.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+### ④ LFC and significance
+
+-   **β₁(condition)** = log₂FoldChange (case/control)
+    -   Control: X=0 → log(μ_control) = β₀
+
+    -   Case: X=1 → log(μ_case) = β₀ + β₁
+
+        ∴ β₁ = log₂(μ_case / μ_control)
+-   **Wald Test**: $z = \frac{\beta_1}{SE(\beta_1)}$ → p-value
+-   **LRT (Likelihood Ratio Test)**: used for time-series or ≥3 group comparisons (χ²-based)
+
+## 4) design matrix
+
+![](/assets/img/DEG/W7_design.png){fig-align="center"}
+
+$$ design = ~ Batch + Confounders + Condition $$
+
+-   Condition: always in the last
+-   reference for β (LFC): X=0 for control (reference), X=1 for case
+
+### Design Matrix (Advanced)
+
+| Analysis Type | Clinical Scenario | Design Formula |
+|----------------|-----------------------------|--------------------------|
+| Paired sample | Tumor vs. Normal, Pre vs. Post | `~ Patient + Treatment` |
+| Interaction Term | Drug response × disease subgroup | `~ Disease + Drug + Disease:Drug` |
+| Time-Series | Multiple time points | `~ Time` (use LRT) |
+| Random Effect | Multiple tissues from the same individual | Not supported in DESeq2 → use `limma-voom` |
+| Hidden batch (sva) | Unmeasured technical/biological factors | `~ Age + Gender + SV1 + SV2 + Condition` |
+
+------------------------------------------------------------------------
+
+## 5) Practice \| DESeq2()
+
+```{r}
+# 1. read data (dds) ####
+dds <- readRDS('data/1_2_dds_filtered.rds')
+dds@colData %>% head
+dds@design
+
+
+# 2. DESeq2 running ####
+# Dispersion estimation -> GLM Fitting -> Wald Test
+# Simple model: ~ condition
+# Paired model: ~ patient + condition (환자별 변동을 보정)
+#               → 더 정밀한 분석!
+
+dds <- DESeq(dds)
+# ① size factor 계산 (normalization)
+# ② dispersion 추정
+# ③ GLM fitting
+# ④ Wald test (통계 검정)
+saveRDS(dds, file='data/2_1_dds_DESeq2.rds')
+
+
+dds@design = as.formula('~ condition')
+dds_smpl <- DESeq(dds)
+saveRDS(dds_smpl, file='data/2_2_dds_DESeq2_simple.rds')
+
+
+# 3. check Dispersion Plot ####
+dds <- readRDS('data/2_1_dds_DESeq2.rds')
+plotDispEsts(dds)
+
+dds_smpl <- readRDS(file='data/2_2_dds_DESeq2_simple.rds')
+plotDispEsts(dds_smpl)
+
+```
+
+------------------------------------------------------------------------
+
+# 3. Visualization of the DEG results
+
+## 1) Significance of DEG Results
+
+### ① multiple testing problem
+
+> Gene A showed no difference between groups (H0)
+
+-   **p-value**: the probability of observing the result [by chance]{.underline} under the null hypothesis (H₀: no difference between groups)
+-   **multiple testing problem**: testing 10,000 genes at p \< 0.05 would yield \~500 spuriously significant results → dramatic increase in false positives
+
+![](/assets/img/postDEG/W8_multiple.png){fig-align="center"}
+
+### ② Multiple Testing Correction
+
+![](/assets/img/DEG/multiple.png){fig-align="center"}
+
+#### Benjamini-Hochberg (BH) Procedure
+
+> "Stricter for higher ranks, more lenient for lower ranks"
+
+$$
+FDR \leq \frac{n_{total} \cdot p_{cut}}{i} \leq \alpha(0.05)
+$$
+
+$$
+p_{cut} \leq \frac{i}{n_{total}} \cdot \alpha
+$$
+
+-   **adjusted p-value (padj) ...** (with cumulative minimum applied) $$
+    p \times \frac{n_{total}}{i} 
+    $$
+
+```{r}
+##| eval: true
+ 
+# FYI. FDR ####
+## 1) example data (5 genes) ####
+pvalues <- c(0.04, 0.001, 0.05, 0.0001, 0.2)
+genes <- c("GeneA", "GeneB", "GeneC", "GeneD", "GeneE")
+df <- data.frame(Gene=genes, P_raw=pvalues)
+df
+
+## 2) sorting p-values ####
+df <- df[order(df$P_raw), ] 
+df
+
+## 3) ranking * BH cutoff (m=5, alpha=0.05) ####
+m <- 5
+alpha <- 0.05
+df$Rank <- 1:m
+df$BH_Threshold <- (df$Rank / m) * alpha
+df
+
+## 4) pass or not ####
+df$Pass <- df$P_raw <= df$BH_Threshold
+df
+
+## 5) padj ####
+df$padj_calc <- df$P_raw * (m / df$Rank)
+df
+df$padj_calc <- pmin(df$padj_calc, 1)
+df
+
+# Cumulative Minimum from bottom
+df$padj_final <- rev(cummin(rev(df$padj_calc)))
+df
+
+df$R_function <- p.adjust(df$P_raw, method="BH")
+df #%>% select(Gene, P_raw, Rank, BH_Threshold, padj_final)
+```
+
+### ③ Independent Filtering (DESeq2)
+
+-   problem: low count genes  hard to get statistical significance
+-   solution: pre-filtering of the low count genes –\> total tests n 🔽 –\> statistical power 🔼
+-   Cases where padj is NA in `DESeq2::results()`:
+    1.  Low-count gene (excluded by independent filtering)
+    2.  Outlier gene (based on Cook's distance)
+
+![](/assets/img/postDEG/W8_independent.png){fig-align="center" width="392"}
+
+### ④ Practice \| DESeq2::results()
+
+> download practice data and save the following files in `data/` in your R project
+
+| File | Link |
+|-------------------------|-----------------------------------------------|
+| `2_1_dds_DESeq2.rds` | [📥 Download](https://drive.google.com/file/d/1Q4HhyfdL9HmKyvwYuVxRrN8BvJYJaOFn/view?usp=drive_link) |
+
+```{r}
+# 0. load DESeq data ####
+dds <- readRDS('data/2_1_dds_DESeq2.rds')
+dds@design
+dds$condition
+
+# 1. Extracting Results ####
+# Contrast 사용 (분석 후 지정)
+res <- results(dds, contrast=c("condition", "Tumor", "Normal"))
+head(res)
+# 결과 구조 이해
+# | 열            | 의미                                   |
+# | baseMean      | 전체 샘플의 평균 발현량                |
+# | log2FoldChange| log2(Tumor / Normal) = LFC             |
+# | lfcSE         | LFC의 표준오차                         |
+# | stat          | Wald test statistic                    |
+# | pvalue        | 원래 p-value                           |
+# | padj          | FDR 보정된 p-value (adjusted p-value)  |
+summary(res)
+
+# another option: Factor level 설정 (미리 설정)
+dds@colData$condition
+dds@colData$condition = relevel(dds@colData$condition, ref='Normal')
+dds@colData$condition
+dds@colData$condition = relevel(dds@colData$condition, ref='Tumor')
+
+## 1-2. Independent Filtering ####
+# x: Mean Normalized Counts, y: number of the significant
+plot(metadata(res)$filterNumRej, 
+     type="b", ylab="Number of rejections", xlab="Quantiles of filter")
+lines(metadata(res)$lo.fit, col="red")
+abline(v=metadata(res)$filterTheta, lty=3)
+title("Independent Filtering Threshold Optimization")
+
+res %>% as_tibble() %>% arrange(padj) %>% tail
+res %>% as_tibble() %>% filter(is.na(padj)) %>% dim
+```
+
+## 2) Visualization of DEG Results
+
+### ① MA Plot (Global View)
+
+::::: columns
+::: {.column width="50%"}
+![](/assets/img/postDEG/W8_MA.png){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+![](/assets/img/postDEG/W8_MA_2.png){fig-align="center"}
+:::
+:::::
+
+-   X-axis: Mean Average (A), Y-axis: Log Ratio (M = log₂FC)
+-   Check for data bias and LFC inflation in low-count genes
+-   Should be symmetric around Y=0
+-   `apeglm::lfcShrink()`: controls LFC in low-count genes (recommended)
+
+```{r}
+##| eval: false
+
+## 2-1. MA plot ####
+# X축: Mean Expression (평균 발현량)
+# Y축: Log2 Fold Change
+# → 전체 데이터의 분포와 bias 확인
+plotMA(res, ylim=c(-5,5), main="Before Shrinkage")
+
+### LFC Shrinkage to control low count genes ####
+resultsNames(dds)
+resLFC <- lfcShrink(dds, coef="condition_Tumor_vs_Normal", type="apeglm")
+summary(resLFC)
+saveRDS(resLFC, file='data/3_dds_DESeq2_shr.rds')
+
+res_df <- as.data.frame(resLFC) %>% 
+  rownames_to_column("gene_id") %>%
+  mutate(is_significant = padj < 0.05 & abs(log2FoldChange) > 1)
+
+# check the shrinkage effect
+par(mfrow=c(1,2))
+plotMA(res, main="Before Shrinkage", ylim=c(-5,5))
+plotMA(resLFC, main="After Shrinkage (Recommended)", ylim=c(-5,5))
+par(mfrow=c(1,1))
+```
+
+### ② Volcano Plot (Selection)
+
+![](/assets/img/postDEG/W8_vol.png){fig-align="center"}
+
+-   X-axis: log₂(Fold Change), Y-axis: −log₁₀(adjusted p-value)
+-   Identify genes with large \|LFC\| and low p-value
+
+```{r}
+##| eval: false
+
+## 2-2. volcano ####
+p_thr=0.05
+lfc_thr = 1
+vol_data <- res_df %>%
+  mutate(diffexpressed = case_when(
+    log2FoldChange > lfc_thr & padj < p_thr ~ "UP",
+    log2FoldChange < -lfc_thr & padj < p_thr ~ "DOWN",
+    TRUE ~ "NO"
+  ))
+head(vol_data)
+
+ggplot(vol_data, aes(x=log2FoldChange, y=-log10(padj), color=diffexpressed)) +
+  geom_point(alpha=0.5, size=1.5) +
+  scale_color_manual(values=c("DOWN"="steelblue", "NO"="grey", "UP"="indianred")) +
+  geom_vline(xintercept=c(-lfc_thr, lfc_thr), linetype="dashed") +
+  geom_hline(yintercept=-log10(p_thr), linetype="dashed") +
+  # labeling the top 10
+  geom_text_repel(data=head(arrange(vol_data, padj), 10), 
+                  aes(label=gene_id), color="black") +
+  theme_minimal() +
+  labs(title="Volcano Plot", x="Log2 Fold Change", y="-Log10 Adjusted P-value")
+
+## using lfc (recommended)
+vol_data2 <- resLFC %>% as.data.frame() %>% mutate(gene_id=rownames(.))  %>% arrange(padj) %>%
+  mutate(diffexpressed = case_when(
+    log2FoldChange > lfc_thr & padj < p_thr ~ "UP",
+    log2FoldChange < -lfc_thr & padj < p_thr ~ "DOWN",
+    TRUE ~ "NO"
+  ))
+head(vol_data2)
+
+ggplot(vol_data2, aes(x=log2FoldChange, y=-log10(padj), color=diffexpressed)) +
+  geom_point(alpha=0.5, size=1.5) +
+  scale_color_manual(values=c("DOWN"="steelblue", "NO"="grey", "UP"="indianred")) +
+  geom_vline(xintercept=c(-lfc_thr, lfc_thr), linetype="dashed") +
+  geom_hline(yintercept=-log10(p_thr), linetype="dashed") +
+  # labeling the top 10
+  geom_text_repel(data=head(arrange(vol_data2, padj), 10), 
+                  aes(label=gene_id), color="black") +
+  theme_minimal() +
+  labs(title="Volcano Plot (shr)", x="Log2 Fold Change", y="-Log10 Adjusted P-value")
+```
+
+### ③ Heatmap (Pattern)
+
+![](/assets/img/postDEG/W8_heatmap.png){fig-align="center"}
+
+-   Visualize expression patterns of top significant genes
+-   Inspect patterns between Case/Control and identify outlier samples
+-   Apply **vst/rlog transformation → z-score scaling**
+
+```{r}
+##| eval: false
+
+## 2-3. heatmap ####
+### 1) vst matrix ####
+vsd <- readRDS('data/1_3_vsd.rds')
+
+### 2) top 20 ####
+top_genes <- res_df %>% 
+  filter(padj < 0.05) %>%
+  arrange(desc(abs(log2FoldChange))) %>%
+  head(20) %>% 
+  .$gene_id
+head(top_genes)
+
+### 3) vst matrix ####
+mat <- assay(vsd)[top_genes, ]
+head(mat)
+
+## 4) annotations ####
+df <- as.data.frame(colData(dds)[,c("gender","condition")])
+head(df)
+
+# Z-score scaling
+pheatmap(mat, 
+         scale="row",                    # z-score
+         show_rownames=TRUE,             # label gene names
+         show_colnames=FALSE,            # label sample names
+         annotation_col=df,              # sample annotation  
+         cluster_cols = TRUE,            # sample clustering
+         main = "Top 20 DEGs Heatmap"    # plot title
+         )
+
+```
+
+------------------------------------------------------------------------
+
+# 4. GSEA
+
+> gene set enrichment analysis
+
+## 1) functional profiling
+
+So far, we identified \~5,500 DEGs (Tumor vs. Normal) with FDR≤0.05 & \|LFC\|≥1 … So What?
+
+![](/assets/img/postDEG/W8_vol.png){fig-align="center"}
+
+–\> “Do they [functionally cluster]{.underline} in specific biological processes?“ ... **Enrichment**
+
+-   Over-Representation Analysis (ORA)
+-   **Gene Set Enrichment Analysis (GSEA)**
+
+## 2) databases (gene sets)
+
+| Database | Characteristics | Typical Use Case |
+|------------------------|------------------------|------------------------|
+| [KEGG](https://www.genome.jp/kegg/) | Metabolic and disease pathways | Metabolic disease, signaling cascades |
+| [Gene Ontology(GO)](https://geneontology.org/) | Hierarchical gene function classification | Most widely used across all fields |
+| [Reactome](https://reactome.org/) | Peer-reviewed, manually curated pathways | Detailed biochemical mechanisms |
+| [MSigDB](https://www.gsea-msigdb.org/gsea/msigdb) / [**Enrichr**](https://maayanlab.cloud/Enrichr/#libraries) | 225+ diverse gene set collections | Exploratory analyses |
+
+![](/assets/img/postDEG/W9_enrichr.png){fig-align="center"}
+
+## 3) principle of GSEA
+
+### ① input
+
+> ranked genes + gene sets
+
+![](/assets/img/postDEG/ranked.png){fig-align="center"}
+
+### ② measure of Enrichment Score (ES)
+
+> for each gene set
+
+![](/assets/img/postDEG/ES.png){fig-align="center"}
+
+patterns of ES
+
+![](/assets/img/postDEG/W10_pattern.png)
+
+### ③ how to get significance
+
+> permutation
+
+![](/assets/img/postDEG/permut.png){fig-align="center"}
+
+## 4) Practice \| clusterProfiler
+
+> download practice data and save the following files in `data/` in your R project
+
+| File | Link |
+|------------------------------------------------|------------------------|
+| `4_1_res_DESeq2_with_entrez_and_rank.rds` | [📥 Download](https://drive.google.com/file/d/1A48HbcJHhQTEUDS-8Dp4iOCWCWMDx-L0/view?usp=drive_link) |
+
+### ① pre-processing
+
+```{r}
+# 1. load results (with entrez_id) ####
+res_df <- readRDS('data/4_1_res_DESeq2_with_entrez_and_rank.rds')
+head(res_df)
+
+## 1-1. input: ranked gene list ####
+cor(res_df$rank_lfc, res_df$rank_pi)
+cor(res_df$rank_lfc, res_df$rank_wald)
+cor(res_df$rank_pi, res_df$rank_wald)
+
+### (optional) removing duplicates
+dim(res_df)
+res_df <- res_df %>% distinct(entrez, .keep_all = TRUE) %>% filter(!is.na(entrez))
+dim(res_df)
+
+## 1-2. ranked gene list ####
+geneList <- res_df$rank_wald
+names(geneList) <- res_df$entrez 
+geneList <- sort(geneList, decreasing = TRUE)
+
+head(geneList) # top up-regulated
+tail(geneList) # top down-regulated
+
+names(geneList) <- res_df$gene 
+geneList <- sort(geneList, decreasing = TRUE)
+
+head(geneList) # top up-regulated
+tail(geneList) # top down-regulated
+```
+
+### ② GSEA
+
+```{r}
+# 2. GSEA ####
+## Gene ontology (GO) ####
+gsea_res <- gseGO(geneList = geneList,
+                  OrgDb        = org.Hs.eg.db,
+                  keyType = "SYMBOL",
+                  ont          = "BP",            
+                  minGSSize    = 10,              # excluding too small pathways
+                  maxGSSize    = 500,             # excluding too large pathways
+                  pvalueCutoff = 1,               # pvalue cutoff to show terms
+                  by = "fgsea" )                  # fgsea: pvalues by tail approximate (fast), DOSE: permutation
+head(gsea_res)
+tail(gsea_res)
+saveRDS(gsea_res,'data/4_2_gsea_GO.rds')
+
+## REACTOME ####
+gsea_res <- gsePathway(geneList, 
+                pvalueCutoff = 1)
+head(gsea_res)
+saveRDS(gsea_res,'data/4_2_gsea_RE.rds')
+```
+
+### ③ visualization
+
+```{r}
+# 3. visualization ####
+gsea_res <- readRDS('data/4_2_gsea_GO.rds')
+## 3-1. Dot Plot (summary) ####
+# x: GeneRatio, dot size: Gene Count, color: p.adjust
+dotplot(gsea_res, showCategory = 5, split = ".sign") + 
+  ggtitle("GO BP Enrichment")
+
+dotplot(gsea_res, showCategory = 5, split = ".sign") + 
+  facet_grid(.~.sign) + # Up/Down Pathway 
+  ggtitle("GO BP Enrichment (split)")
+
+
+## 3-2. GSEA Enrichment Plot (for the specific pathway) ####
+p1 <- gseaplot2(gsea_res, geneSetID = 1, title = gsea_res$Description[1])
+print(p1)
+
+### multiple (Top 3)
+p2 <- gseaplot2(gsea_res, geneSetID = 1:3)
+print(p2)
+
+# 3-3. Ridge Plot (expression level), requring ggridges
+ridgeplot(gsea_res, showCategory = 5) + labs(x = "Enrichment Distribution")
+
+# 3-4. Network plot
+cnetplot(gsea_res, foldChange=geneList)
+```
+
+![](/assets/img/postDEG/GSEA.png){fig-align="center"}
+
+### ④ exploring anything of interest
+
+```{r}
+# 4. Core Enrichment Genes ####
+gsea_res_df <- as.data.frame(gsea_res)
+head(gsea_res_df)
+
+# save the result
+write.csv(gsea_res_df, "data/4_2_gsea_GO_results.csv")
+
+# show core genes for a pathway
+core_genes <- strsplit(gsea_res_df$core_enrichment[1], "/")[[1]]
+print(core_genes)
+
+
+# 5. 자유 탐색 아이디어: 관심 유전자 탐색 ####
+# 특정 유전자가 종양에서 어떻게 변하는지 확인
+my_gene <- "EGFR"  # 원하는 유전자로 바꿔보세요
+my_gene <- "ARHGAP44"  # 원하는 유전자로 바꿔보세요
+
+# 발현량 시각화
+plotCounts(dds, gene = my_gene, intgroup = "condition", returnData = FALSE)
+
+# 더 예쁘게
+plot_data <- plotCounts(dds, gene = my_gene, intgroup = "condition", returnData = TRUE)
+plot_data$count %>% head
+plot_data$count %>% max
+counts(dds,normalized=T)[my_gene,] %>% max
+log2(counts(dds,normalized=T)[my_gene,] %>% max)
+
+ggplot(plot_data, aes(x = condition, y = log2(count+1), fill = condition)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  labs(title = paste0(my_gene, " Expression"),
+       y = "log2(Normalized Counts)") +
+  theme_minimal()
+
+```
+
+![](/assets/img/postDEG/box.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+# 전체 분석 파이프라인
+
+![](/assets/img/summary.png){fig-align="center"}
+
+------------------------------------------------------------------------
+
+## ➕ references
+
+### EDA & Transformation
+
+[vst / rlog: Anders & Huber, Genome Biology 2010](https://doi.org/10.1186/gb-2010-11-10-r106)\
+[DESeq2 Vignette — Data transformations](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#data-transformations-and-visualization)\
+[StatQuest: PCA step-by-step](https://www.youtube.com/watch?v=FgakZw6K1QQ)
+
+### DESeq2
+
+[DESeq2: Love, Huber & Anders, Genome Biology 2014](https://doi.org/10.1186/s13059-014-0550-8)\
+[DESeq2 Vignette (Bioconductor)](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)\
+[RNA-seq workflow: gene-level EDA & DEG (F1000Research)](https://doi.org/10.12688/f1000research.7035.2)\
+[LFC shrinkage — apeglm: Zhu, Ibrahim & Love, Bioinformatics 2019](https://doi.org/10.1093/bioinformatics/bty895)\
+[Design matrix guide: Law et al., F1000Research 2020](https://doi.org/10.12688/f1000research.27893.1)
+
+### Multiple Testing
+
+[BH procedure: Benjamini & Hochberg, JRSS-B 1995](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x)\
+[Independent filtering: Bourgon, Gentleman & Huber, PNAS 2010](https://doi.org/10.1073/pnas.0914005107)\
+[StatQuest: FDR and multiple testing](https://www.youtube.com/watch?v=K8LQSvtjcEo)
+
+### Visualization
+
+[EnhancedVolcano (Bioconductor)](https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html)\
+[ComplexHeatmap: Gu et al., Bioinformatics 2016](https://doi.org/10.1093/bioinformatics/btw313)\
+[ComplexHeatmap Complete Reference](https://jokergoo.github.io/ComplexHeatmap-reference/book/)
+
+### GSEA
+
+[GSEA: Subramanian et al., PNAS 2005](https://doi.org/10.1073/pnas.0506580102)\
+[Mootha et al., Nature Genetics 2003](https://doi.org/10.1038/ng1180)\
+[clusterProfiler 4.0: Wu et al., The Innovation 2021](https://doi.org/10.1016/j.xinn.2021.100141)\
+[clusterProfiler Book (Yu Lab)](https://yulab-smu.top/biomedical-knowledge-mining-book/)\
+[MSigDB](https://www.gsea-msigdb.org/gsea/msigdb)\
+[Gene Ontology](https://geneontology.org/)\
+[Reactome](https://reactome.org/)

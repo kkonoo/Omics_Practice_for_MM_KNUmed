@@ -1,0 +1,2494 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="하은지 (분자의학교실)">
+<meta name="dcterms.date" content="2026-08-11">
+
+<title>오믹스 데이터 분석 기술 Day 1</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../assets/img/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ce826da2fa3c9e096839ca24c2274fc1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/html.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/img/logo.jpg" alt="" class="navbar-logo light-content">
+    <img src="../assets/img/logo.jpg" alt="" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../resources/index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../resources/Day1.html"> 
+<span class="menu-text">Day1</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../resources/Day2.html" aria-current="page"> 
+<span class="menu-text">Day2</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Contents</h2>
+   
+  <ul>
+  <li><a href="#todays-lecture" id="toc-todays-lecture" class="nav-link active" data-scroll-target="#todays-lecture">Today’s lecture</a></li>
+  <li><a href="#eda-explantory-data-analysis" id="toc-eda-explantory-data-analysis" class="nav-link" data-scroll-target="#eda-explantory-data-analysis">1. EDA (explantory data analysis)</a>
+  <ul>
+  <li><a href="#why-do-we-need-eda" id="toc-why-do-we-need-eda" class="nav-link" data-scroll-target="#why-do-we-need-eda">1) why do we need EDA?</a></li>
+  <li><a href="#data-transformation-vst-vs.-rlog" id="toc-data-transformation-vst-vs.-rlog" class="nav-link" data-scroll-target="#data-transformation-vst-vs.-rlog">2) Data Transformation: vst vs.&nbsp;rlog</a>
+  <ul>
+  <li><a href="#vst" id="toc-vst" class="nav-link" data-scroll-target="#vst">① vst</a></li>
+  <li><a href="#rlog" id="toc-rlog" class="nav-link" data-scroll-target="#rlog">② rlog</a></li>
+  <li><a href="#practice-deseq2vst" id="toc-practice-deseq2vst" class="nav-link" data-scroll-target="#practice-deseq2vst">③ Practice | DESeq2::vst()</a></li>
+  <li><a href="#i.-load-data-luad-data-from-tcga-n582" id="toc-i.-load-data-luad-data-from-tcga-n582" class="nav-link" data-scroll-target="#i.-load-data-luad-data-from-tcga-n582">i. load data (LUAD data from TCGA, n=58*2)</a></li>
+  <li><a href="#ii.-pre-filtering" id="toc-ii.-pre-filtering" class="nav-link" data-scroll-target="#ii.-pre-filtering">ii. pre-filtering</a></li>
+  <li><a href="#iii.-data-transformation" id="toc-iii.-data-transformation" class="nav-link" data-scroll-target="#iii.-data-transformation">iii. data transformation</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#visual-exploration" id="toc-visual-exploration" class="nav-link" data-scroll-target="#visual-exploration">3) Visual Exploration</a>
+  <ul>
+  <li><a href="#pca" id="toc-pca" class="nav-link" data-scroll-target="#pca">PCA</a></li>
+  </ul></li>
+  <li><a href="#deg-analysis" id="toc-deg-analysis" class="nav-link" data-scroll-target="#deg-analysis">2. DEG analysis</a>
+  <ul>
+  <li><a href="#deg" id="toc-deg" class="nav-link" data-scroll-target="#deg">1) DEG</a></li>
+  <li><a href="#linear-model" id="toc-linear-model" class="nav-link" data-scroll-target="#linear-model">2) linear model</a>
+  <ul>
+  <li><a href="#variance-decomposition" id="toc-variance-decomposition" class="nav-link" data-scroll-target="#variance-decomposition">Variance decomposition</a></li>
+  </ul></li>
+  <li><a href="#statistical-model-of-deseq2" id="toc-statistical-model-of-deseq2" class="nav-link" data-scroll-target="#statistical-model-of-deseq2">3) statistical model of DESeq2</a>
+  <ul>
+  <li><a href="#characteristics-of-rna-seq-data" id="toc-characteristics-of-rna-seq-data" class="nav-link" data-scroll-target="#characteristics-of-rna-seq-data">① Characteristics of RNA-seq Data</a></li>
+  <li><a href="#glm" id="toc-glm" class="nav-link" data-scroll-target="#glm">② GLM</a></li>
+  <li><a href="#estimating-dispersion-α-shrinkage" id="toc-estimating-dispersion-α-shrinkage" class="nav-link" data-scroll-target="#estimating-dispersion-α-shrinkage">③ Estimating Dispersion α (Shrinkage)</a></li>
+  <li><a href="#lfc-and-significance" id="toc-lfc-and-significance" class="nav-link" data-scroll-target="#lfc-and-significance">④ LFC and significance</a></li>
+  </ul></li>
+  <li><a href="#design-matrix" id="toc-design-matrix" class="nav-link" data-scroll-target="#design-matrix">4) design matrix</a>
+  <ul>
+  <li><a href="#design-matrix-advanced" id="toc-design-matrix-advanced" class="nav-link" data-scroll-target="#design-matrix-advanced">Design Matrix (Advanced)</a></li>
+  </ul></li>
+  <li><a href="#practice-deseq2" id="toc-practice-deseq2" class="nav-link" data-scroll-target="#practice-deseq2">5) Practice | DESeq2()</a></li>
+  </ul></li>
+  <li><a href="#visualization-of-the-deg-results" id="toc-visualization-of-the-deg-results" class="nav-link" data-scroll-target="#visualization-of-the-deg-results">3. Visualization of the DEG results</a>
+  <ul>
+  <li><a href="#significance-of-deg-results" id="toc-significance-of-deg-results" class="nav-link" data-scroll-target="#significance-of-deg-results">1) Significance of DEG Results</a>
+  <ul>
+  <li><a href="#multiple-testing-problem" id="toc-multiple-testing-problem" class="nav-link" data-scroll-target="#multiple-testing-problem">① multiple testing problem</a></li>
+  <li><a href="#multiple-testing-correction" id="toc-multiple-testing-correction" class="nav-link" data-scroll-target="#multiple-testing-correction">② Multiple Testing Correction</a>
+  <ul class="collapse">
+  <li><a href="#benjamini-hochberg-bh-procedure" id="toc-benjamini-hochberg-bh-procedure" class="nav-link" data-scroll-target="#benjamini-hochberg-bh-procedure">Benjamini-Hochberg (BH) Procedure</a></li>
+  </ul></li>
+  <li><a href="#independent-filtering-deseq2" id="toc-independent-filtering-deseq2" class="nav-link" data-scroll-target="#independent-filtering-deseq2">③ Independent Filtering (DESeq2)</a></li>
+  <li><a href="#practice-deseq2results" id="toc-practice-deseq2results" class="nav-link" data-scroll-target="#practice-deseq2results">④ Practice | DESeq2::results()</a></li>
+  </ul></li>
+  <li><a href="#visualization-of-deg-results" id="toc-visualization-of-deg-results" class="nav-link" data-scroll-target="#visualization-of-deg-results">2) Visualization of DEG Results</a>
+  <ul>
+  <li><a href="#ma-plot-global-view" id="toc-ma-plot-global-view" class="nav-link" data-scroll-target="#ma-plot-global-view">① MA Plot (Global View)</a></li>
+  <li><a href="#volcano-plot-selection" id="toc-volcano-plot-selection" class="nav-link" data-scroll-target="#volcano-plot-selection">② Volcano Plot (Selection)</a></li>
+  <li><a href="#heatmap-pattern" id="toc-heatmap-pattern" class="nav-link" data-scroll-target="#heatmap-pattern">③ Heatmap (Pattern)</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#gsea" id="toc-gsea" class="nav-link" data-scroll-target="#gsea">4. GSEA</a>
+  <ul>
+  <li><a href="#functional-profiling" id="toc-functional-profiling" class="nav-link" data-scroll-target="#functional-profiling">1) functional profiling</a></li>
+  <li><a href="#databases-gene-sets" id="toc-databases-gene-sets" class="nav-link" data-scroll-target="#databases-gene-sets">2) databases (gene sets)</a></li>
+  <li><a href="#principle-of-gsea" id="toc-principle-of-gsea" class="nav-link" data-scroll-target="#principle-of-gsea">3) principle of GSEA</a>
+  <ul>
+  <li><a href="#input" id="toc-input" class="nav-link" data-scroll-target="#input">① input</a></li>
+  <li><a href="#measure-of-enrichment-score-es" id="toc-measure-of-enrichment-score-es" class="nav-link" data-scroll-target="#measure-of-enrichment-score-es">② measure of Enrichment Score (ES)</a></li>
+  <li><a href="#how-to-get-significance" id="toc-how-to-get-significance" class="nav-link" data-scroll-target="#how-to-get-significance">③ how to get significance</a></li>
+  </ul></li>
+  <li><a href="#practice-clusterprofiler" id="toc-practice-clusterprofiler" class="nav-link" data-scroll-target="#practice-clusterprofiler">4) Practice | clusterProfiler</a>
+  <ul>
+  <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">① pre-processing</a></li>
+  <li><a href="#gsea-1" id="toc-gsea-1" class="nav-link" data-scroll-target="#gsea-1">② GSEA</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">③ visualization</a></li>
+  <li><a href="#exploring-anything-of-interest" id="toc-exploring-anything-of-interest" class="nav-link" data-scroll-target="#exploring-anything-of-interest">④ exploring anything of interest</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#전체-분석-파이프라인" id="toc-전체-분석-파이프라인" class="nav-link" data-scroll-target="#전체-분석-파이프라인">전체 분석 파이프라인</a>
+  <ul>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">➕ references</a>
+  <ul>
+  <li><a href="#eda-transformation" id="toc-eda-transformation" class="nav-link" data-scroll-target="#eda-transformation">EDA &amp; Transformation</a></li>
+  <li><a href="#deseq2" id="toc-deseq2" class="nav-link" data-scroll-target="#deseq2">DESeq2</a></li>
+  <li><a href="#multiple-testing" id="toc-multiple-testing" class="nav-link" data-scroll-target="#multiple-testing">Multiple Testing</a></li>
+  <li><a href="#visualization-1" id="toc-visualization-1" class="nav-link" data-scroll-target="#visualization-1">Visualization</a></li>
+  <li><a href="#gsea-2" id="toc-gsea-2" class="nav-link" data-scroll-target="#gsea-2">GSEA</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-page-left" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">오믹스 데이터 분석 기술 Day 1</h1>
+<p class="subtitle lead">의학과 4학년 1학기 - 분자의학 선택연구</p>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-left">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>하은지 (분자의학교실) </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 11, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="todays-lecture" class="level1">
+<h1>Today’s lecture</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/day2.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="eda-explantory-data-analysis" class="level1">
+<h1>1. EDA (explantory data analysis)</h1>
+<section id="why-do-we-need-eda" class="level2">
+<h2 class="anchored" data-anchor-id="why-do-we-need-eda">1) why do we need EDA?</h2>
+<p>Visualize data <u>before statistical analysis</u> to <strong>understand its overall characteristics and quality</strong></p>
+<ul>
+<li><strong>Quality Control</strong>: identify outlier samples</li>
+<li><strong>Batch Effect Detection</strong>: check whether technical noise (experiment date, instrument, etc.) is masking biological signal</li>
+<li><strong>Heteroscedasticity</strong>: variance increases with expression level → a small number of highly expressed genes can dominate the entire analysis</li>
+</ul>
+<hr>
+</section>
+<section id="data-transformation-vst-vs.-rlog" class="level2">
+<h2 class="anchored" data-anchor-id="data-transformation-vst-vs.-rlog">2) Data Transformation: vst vs.&nbsp;rlog</h2>
+<p>we need to transform our data (RNA-seq data) for statistic analyses</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/trans.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<p>💡 vst/rlog transformed values are <strong>for visualization only</strong>; raw counts must be used for differential analysis!</p>
+<hr>
+<section id="vst" class="level3">
+<h3 class="anchored" data-anchor-id="vst">① vst</h3>
+<blockquote class="blockquote">
+<p>Variance Stabilizing Transformation</p>
+</blockquote>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Suitable for n ≥ 30 (large sample sizes)</li>
+<li>Based on a global trend → fast</li>
+<li><code>asinh</code> transformation for highly-expressed genes</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/vst.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="rlog" class="level3">
+<h3 class="anchored" data-anchor-id="rlog">② rlog</h3>
+<blockquote class="blockquote">
+<p>regularized Log</p>
+</blockquote>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Suitable for n &lt; 30 (small sample sizes)</li>
+<li>Per-gene shrinkage (Bayesian estimation) → slow</li>
+<li>Suppresses noise in low-count genes</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/rlog.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>💡 Imagine this</p>
+<pre><code>gene A (low):
+sample 1: 1, sample 2: 5 ➡️ logFC = log2(5/1) = 2.32 … noise ↑
+
+gene B (high):
+sample 1: 1000, sample 2: 1004 ➡️ logFC = log2(1004/1000) = 0.005 … noise ↓ (stabilized)</code></pre>
+<hr>
+</section>
+<section id="practice-deseq2vst" class="level3">
+<h3 class="anchored" data-anchor-id="practice-deseq2vst">③ Practice | DESeq2::vst()</h3>
+<blockquote class="blockquote">
+<p>download practice data and save the following files in <code>data/</code> in your R project</p>
+</blockquote>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>0_raw_counts_final.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1y6rBloxvp5c4iYr7AVqVjUrpgZiBaSXR/view?usp=drive_link">📥 Download</a></td>
+</tr>
+<tr class="even">
+<td><code>0_meta_data_final.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1-vi09nduyHYfKIGTWkfdvcRVyzIh3WED/view?usp=drive_link">📥 Download</a></td>
+</tr>
+<tr class="odd">
+<td><code>1_1_dds.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1noV8OAt2t5cbRceGDe1oUgY-nJBbxvNF/view?usp=drive_link">📥 Download</a></td>
+</tr>
+<tr class="even">
+<td><code>1_2_dds_filtered.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1pZukVok9fwXjCe-LhbD-EJ_i98g526_5/view?usp=drive_link">📥 Download</a></td>
+</tr>
+<tr class="odd">
+<td><code>1_3_vsd.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1FD6KadX9vYeTMeoayBcv0ejMmaxDdQeH/view?usp=drive_link">📥 Download</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="i.-load-data-luad-data-from-tcga-n582" class="level3">
+<h3 class="anchored" data-anchor-id="i.-load-data-luad-data-from-tcga-n582">i. load data (LUAD data from TCGA, n=58*2)</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)    <span class="co"># dplyr, ggplot2 등 포함</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># set your wd or open your R project</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"T:/homes/eha/교육/[학부] 4-1 분자의학 선택연구/2026/"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. read data (count table and metadata) ####</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>countData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/0_raw_counts_final.rds'</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(countData)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(countData[,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>colData <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/0_meta_data_final.rds"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(colData)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(colData<span class="sc">$</span>tissue_type)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># check sample ids of the count table and metadata</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">colnames</span>(countData) <span class="sc">==</span> colData<span class="sc">$</span>barcode) <span class="co"># should be TRUE</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># set the Factor level (condition)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># default: alphabetical ... ref = Control/Normal</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>colData<span class="sc">$</span>condition <span class="ot">&lt;-</span> <span class="fu">factor</span>(colData<span class="sc">$</span>tissue_type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Normal"</span>, <span class="st">"Tumor"</span>)) </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>colData<span class="sc">$</span>condition</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># case / control ... treatment / control ... KO / control</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. DESeq2 object (dds) ####</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># countData, colData, design</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromMatrix</span>(<span class="at">countData =</span> countData,</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                              <span class="at">colData =</span> colData,</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                              <span class="at">design =</span> <span class="sc">~</span> patient <span class="sc">+</span> condition) <span class="co"># DEG by condition</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>colData<span class="sc">$</span>patient <span class="ot">=</span> <span class="fu">gsub</span>(<span class="st">'-'</span>,<span class="st">'_'</span>,colData<span class="sc">$</span>patient)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>dds</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(dds, <span class="at">file=</span><span class="st">'data/1_1_dds.rds'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="ii.-pre-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="ii.-pre-filtering">ii. pre-filtering</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Pre-filtering (de-noising) ####</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(<span class="fu">counts</span>(dds))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">counts</span>(dds)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>])</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">counts</span>(dds)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]<span class="sc">&gt;=</span><span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">rowSums</span>(<span class="fu">counts</span>(dds)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]<span class="sc">&gt;=</span><span class="dv">1</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">rowSums</span>(<span class="fu">counts</span>(dds)<span class="sc">&gt;=</span><span class="dv">1</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">rowSums</span>(<span class="fu">counts</span>(dds)) <span class="sc">%&gt;%</span> head</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 3-1. lowly expressed genes (for speed-up &amp; statistical power) ####</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="do">### option 1: simple (Total Count &lt; 10?) ####</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(<span class="fu">counts</span>(dds)) <span class="sc">&gt;=</span> <span class="dv">10</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(keep)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"   Removed"</span>, <span class="fu">sum</span>(<span class="sc">!</span>keep), <span class="st">"low count genes.</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"   Remaining genes:"</span>, <span class="fu">sum</span>(keep), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>dds_filtered <span class="ot">&lt;-</span> dds[keep, ]</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="do">### option 2: considring group size (recommended) ####</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Total Count &lt; 10 in the smallest group?</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># ex: Control(3), Case(10) -&gt; non-zero counts in at least 3 samples?</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>main_condition <span class="ot">=</span> <span class="st">'condition'</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>smallestGroupSize <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="fu">table</span>(colData[[main_condition]]))</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>smallestGroupSize<span class="sc">*</span><span class="fl">0.4</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(<span class="fu">counts</span>(dds) <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">&gt;=</span> (smallestGroupSize<span class="sc">*</span><span class="fl">0.5</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"   Removed"</span>, <span class="fu">sum</span>(<span class="sc">!</span>keep), <span class="st">"low count genes.</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">"   Remaining genes:"</span>, <span class="fu">sum</span>(keep), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>dds_filtered <span class="ot">&lt;-</span> dds[keep, ]</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 3-2. confounding genes ####</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>all_genes <span class="ot">&lt;-</span> <span class="fu">rownames</span>(dds_filtered)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_genes)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Mitochodiral: starting with "^MT-" </span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>mt_genes <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"^MT-"</span>, all_genes, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>mt_genes</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Ribosomal: starting with "^RPS|^RPL"</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>ribo_genes <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"^RPS|^RPL"</span>, all_genes, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>ribo_genes</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Immunoglobulin: starting with "^IG[HKL]" : "IGH", "IGK", "IGL"</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>ig_genes <span class="ot">&lt;-</span> <span class="fu">grep</span>(<span class="st">"^IG[HKL]"</span>, all_genes, <span class="at">value =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>ig_genes</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># filtering gene list</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>contam_list <span class="ot">&lt;-</span> <span class="fu">c</span>(mt_genes, ribo_genes, ig_genes)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(contam_list)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co"># !: 'NOT'</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>keep_indices <span class="ot">&lt;-</span> <span class="sc">!</span>(all_genes <span class="sc">%in%</span> contam_list)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>dds_filtered <span class="ot">&lt;-</span> dds_filtered[keep_indices, ]</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>dds_filtered</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(dds_filtered, <span class="at">file=</span><span class="st">'data/1_2_dds_filtered.rds'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="iii.-data-transformation" class="level3">
+<h3 class="anchored" data-anchor-id="iii.-data-transformation">iii. data transformation</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Variance Stabilizing Transformation (vst) ####</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 4-1. vst (normalization and transformation) ####</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>vsd <span class="ot">&lt;-</span> <span class="fu">vst</span>(dds_filtered, <span class="at">blind=</span><span class="cn">FALSE</span>) </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># blind = FALSE: using design (recommended), blind=TRUE: using only technical noises</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(vsd, <span class="at">file=</span><span class="st">'data/1_3_vsd.rds'</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># check the result visually</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>vsd_data <span class="ot">=</span> <span class="fu">assay</span>(vsd)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vsd_data[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]) <span class="co"># similar to log-scale</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>df_vst <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mean =</span> <span class="fu">rowMeans</span>(vsd_data),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">sd =</span> <span class="fu">apply</span>(vsd_data, <span class="dv">1</span>, sd)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                     )</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_vst)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_vst, <span class="fu">aes</span>(<span class="at">x =</span> mean, <span class="at">y =</span> sd)) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="co"># trend line</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Variance Stabilization Check (VST)"</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Mean Expression"</span>, <span class="at">y =</span> <span class="st">"Standard Deviation"</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># no transformation</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>count_data <span class="ot">=</span> <span class="fu">assay</span>(dds_filtered)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>df_count <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mean =</span> <span class="fu">rowMeans</span>(count_data),</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sd =</span> <span class="fu">apply</span>(count_data, <span class="dv">1</span>, sd)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_count, <span class="fu">aes</span>(<span class="at">x =</span> mean, <span class="at">y =</span> sd)) <span class="sc">+</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span> <span class="co">#  trend line</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Variance Stabilization Check (no transf)"</span>,</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Mean Expression"</span>, <span class="at">y =</span> <span class="st">"Standard Deviation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><img src="..\assets/img/DEG/W6_vst_trans.png" class="img-fluid"></p>
+<hr>
+</section>
+</section>
+</section>
+<section id="visual-exploration" class="level1">
+<h1>3) Visual Exploration</h1>
+<p>What to check through visualization:</p>
+<ul>
+<li>Is there a difference between groups?</li>
+<li>Are there any outlier samples?</li>
+<li>Is there a batch effect?</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/EDA.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+<section id="pca" class="level2">
+<h2 class="anchored" data-anchor-id="pca">PCA</h2>
+<blockquote class="blockquote">
+<p>principal component analysis</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W6_PCA_theory.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 5-1. PCA plot ####</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pca_res <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(<span class="fu">t</span>(vsd_data))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pca_res<span class="sc">$</span>x <span class="sc">%&gt;%</span> head</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># PC1 and PC2</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>pca_coords <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pca_res<span class="sc">$</span>x)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>pca_coords <span class="sc">%&gt;%</span> head</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pca_coords, <span class="fu">aes</span>(<span class="at">x=</span>PC1, <span class="at">y=</span>PC2)) <span class="sc">+</span> </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size=</span><span class="dv">3</span>) <span class="sc">+</span> <span class="fu">ggtitle</span>(<span class="st">"PCA Result"</span>) <span class="sc">+</span> <span class="fu">theme_bw</span>()</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 5-2. using DESeq2 function (using top 100) ####</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plotPCA</span>(vsd, <span class="at">intgroup =</span> <span class="st">"condition"</span>) <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"PCA Plot"</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plotPCA</span>(vsd, <span class="at">ntop=</span><span class="fu">nrow</span>(vsd), <span class="at">intgroup =</span> <span class="st">"condition"</span>) <span class="sc">+</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"PCA Plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W6_PCA.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="deg-analysis" class="level1">
+<h1>2. DEG analysis</h1>
+<section id="deg" class="level2">
+<h2 class="anchored" data-anchor-id="deg">1) DEG</h2>
+<blockquote class="blockquote">
+<p>differentially expressed genes; genes whose expression levels change significantly between different conditions (e.g., Case vs.&nbsp;Control)</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W7_DEG.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<p>💡Not t-test!</p>
+<blockquote class="blockquote">
+<p>doesn’t work for RNA-seq data</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/trans.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="linear-model" class="level2">
+<h2 class="anchored" data-anchor-id="linear-model">2) linear model</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/lm.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<div class="columns">
+<div class="column" style="width:38%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W7_LM_var.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="740"></p>
+</figure>
+</div>
+</div><div class="column" style="width:62%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W7_LM.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+<section id="variance-decomposition" class="level3">
+<h3 class="anchored" data-anchor-id="variance-decomposition">Variance decomposition</h3>
+<blockquote class="blockquote">
+<p>“Statistics is the process of tracing the source of variation.”</p>
+</blockquote>
+<p><span class="math display">\[ Total Variance (RNA) = \mathbf{Condition} + \mathbf{Batch} + Residual \]</span></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/var.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="statistical-model-of-deseq2" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-model-of-deseq2">3) statistical model of DESeq2</h2>
+<section id="characteristics-of-rna-seq-data" class="level3">
+<h3 class="anchored" data-anchor-id="characteristics-of-rna-seq-data">① Characteristics of RNA-seq Data</h3>
+<ul>
+<li><strong>Count data</strong>: discrete integers including zero</li>
+<li><strong>Overdispersion</strong>: variance &gt;&gt;&gt; mean → standard linear regression is not appropriate</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/NB.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<ul>
+<li><strong>Negative Binomial Distribution</strong></li>
+</ul>
+<p><span class="math display">\[ Var(\mu) = \mu + \alpha\mu^2 \]</span></p>
+<p><span class="math inline">\(\mu\)</span>: mean expression (intrinsic sampling error)<br>
+<span class="math inline">\(\alpha\mu^2\)</span>: overdispersion (variation across biological replicates)</p>
+<hr>
+</section>
+<section id="glm" class="level3">
+<h3 class="anchored" data-anchor-id="glm">② GLM</h3>
+<blockquote class="blockquote">
+<p>Generalized Linear Model</p>
+</blockquote>
+<p><span class="math display">\[ \log(\mu) = \beta_0 + \beta_1(condition) + \beta_2(batch) + \cdots \]</span></p>
+<div class="columns">
+<div class="column" style="width:38%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/GLM.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div><div class="column" style="width:62%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/GLM2.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="estimating-dispersion-α-shrinkage" class="level3">
+<h3 class="anchored" data-anchor-id="estimating-dispersion-α-shrinkage">③ Estimating Dispersion α (Shrinkage)</h3>
+<p>Addresses inaccurate per-gene α estimation in small samples (e.g., n=3):</p>
+<ol type="1">
+<li><strong>Gene-wise</strong>: calculate the raw dispersion for each gene</li>
+<li><strong>Trend line</strong>: fit a global trend line across all genes</li>
+<li><strong>Shrink</strong>: pull noisy estimates toward the trend line → improved accuracy, reduced false positives</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W7_dispersion.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+<section id="lfc-and-significance" class="level3">
+<h3 class="anchored" data-anchor-id="lfc-and-significance">④ LFC and significance</h3>
+<ul>
+<li><strong>β₁(condition)</strong> = log₂FoldChange (case/control)
+<ul>
+<li><p>Control: X=0 → log(μ_control) = β₀</p></li>
+<li><p>Case: X=1 → log(μ_case) = β₀ + β₁</p>
+<p>∴ β₁ = log₂(μ_case / μ_control)</p></li>
+</ul></li>
+<li><strong>Wald Test</strong>: <span class="math inline">\(z = \frac{\beta_1}{SE(\beta_1)}\)</span> → p-value</li>
+<li><strong>LRT (Likelihood Ratio Test)</strong>: used for time-series or ≥3 group comparisons (χ²-based)</li>
+</ul>
+</section>
+</section>
+<section id="design-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="design-matrix">4) design matrix</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/W7_design.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<p><span class="math display">\[ design = ~ Batch + Confounders + Condition \]</span></p>
+<ul>
+<li>Condition: always in the last</li>
+<li>reference for β (LFC): X=0 for control (reference), X=1 for case</li>
+</ul>
+<section id="design-matrix-advanced" class="level3">
+<h3 class="anchored" data-anchor-id="design-matrix-advanced">Design Matrix (Advanced)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 40%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Analysis Type</th>
+<th>Clinical Scenario</th>
+<th>Design Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Paired sample</td>
+<td>Tumor vs.&nbsp;Normal, Pre vs.&nbsp;Post</td>
+<td><code>~ Patient + Treatment</code></td>
+</tr>
+<tr class="even">
+<td>Interaction Term</td>
+<td>Drug response × disease subgroup</td>
+<td><code>~ Disease + Drug + Disease:Drug</code></td>
+</tr>
+<tr class="odd">
+<td>Time-Series</td>
+<td>Multiple time points</td>
+<td><code>~ Time</code> (use LRT)</td>
+</tr>
+<tr class="even">
+<td>Random Effect</td>
+<td>Multiple tissues from the same individual</td>
+<td>Not supported in DESeq2 → use <code>limma-voom</code></td>
+</tr>
+<tr class="odd">
+<td>Hidden batch (sva)</td>
+<td>Unmeasured technical/biological factors</td>
+<td><code>~ Age + Gender + SV1 + SV2 + Condition</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+</section>
+<section id="practice-deseq2" class="level2">
+<h2 class="anchored" data-anchor-id="practice-deseq2">5) Practice | DESeq2()</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. read data (dds) ####</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/1_2_dds_filtered.rds'</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>colData <span class="sc">%&gt;%</span> head</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>design</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. DESeq2 running ####</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Dispersion estimation -&gt; GLM Fitting -&gt; Wald Test</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple model: ~ condition</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Paired model: ~ patient + condition (환자별 변동을 보정)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#               → 더 정밀한 분석!</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">DESeq</span>(dds)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ① size factor 계산 (normalization)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ② dispersion 추정</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ③ GLM fitting</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># ④ Wald test (통계 검정)</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(dds, <span class="at">file=</span><span class="st">'data/2_1_dds_DESeq2.rds'</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>design <span class="ot">=</span> <span class="fu">as.formula</span>(<span class="st">'~ condition'</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>dds_smpl <span class="ot">&lt;-</span> <span class="fu">DESeq</span>(dds)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(dds_smpl, <span class="at">file=</span><span class="st">'data/2_2_dds_DESeq2_simple.rds'</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. check Dispersion Plot ####</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/2_1_dds_DESeq2.rds'</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plotDispEsts</span>(dds)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>dds_smpl <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="at">file=</span><span class="st">'data/2_2_dds_DESeq2_simple.rds'</span>)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">plotDispEsts</span>(dds_smpl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="visualization-of-the-deg-results" class="level1">
+<h1>3. Visualization of the DEG results</h1>
+<section id="significance-of-deg-results" class="level2">
+<h2 class="anchored" data-anchor-id="significance-of-deg-results">1) Significance of DEG Results</h2>
+<section id="multiple-testing-problem" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-testing-problem">① multiple testing problem</h3>
+<blockquote class="blockquote">
+<p>Gene A showed no difference between groups (H0)</p>
+</blockquote>
+<ul>
+<li><strong>p-value</strong>: the probability of observing the result <u>by chance</u> under the null hypothesis (H₀: no difference between groups)</li>
+<li><strong>multiple testing problem</strong>: testing 10,000 genes at p &lt; 0.05 would yield ~500 spuriously significant results → dramatic increase in false positives</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_multiple.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="multiple-testing-correction" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-testing-correction">② Multiple Testing Correction</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/DEG/multiple.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<section id="benjamini-hochberg-bh-procedure" class="level4">
+<h4 class="anchored" data-anchor-id="benjamini-hochberg-bh-procedure">Benjamini-Hochberg (BH) Procedure</h4>
+<blockquote class="blockquote">
+<p>“Stricter for higher ranks, more lenient for lower ranks”</p>
+</blockquote>
+<p><span class="math display">\[
+FDR \leq \frac{n_{total} \cdot p_{cut}}{i} \leq \alpha(0.05)
+\]</span></p>
+<p><span class="math display">\[
+p_{cut} \leq \frac{i}{n_{total}} \cdot \alpha
+\]</span></p>
+<ul>
+<li><strong>adjusted p-value (padj) …</strong> (with cumulative minimum applied) <span class="math display">\[
+p \times \frac{n_{total}}{i}
+\]</span></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">##| eval: true</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># FYI. FDR ####</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 1) example data (5 genes) ####</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>pvalues <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.04</span>, <span class="fl">0.001</span>, <span class="fl">0.05</span>, <span class="fl">0.0001</span>, <span class="fl">0.2</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>genes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"GeneA"</span>, <span class="st">"GeneB"</span>, <span class="st">"GeneC"</span>, <span class="st">"GeneD"</span>, <span class="st">"GeneE"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Gene=</span>genes, <span class="at">P_raw=</span>pvalues)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 2) sorting p-values ####</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df[<span class="fu">order</span>(df<span class="sc">$</span>P_raw), ] </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 3) ranking * BH cutoff (m=5, alpha=0.05) ####</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>Rank <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span>m</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>BH_Threshold <span class="ot">&lt;-</span> (df<span class="sc">$</span>Rank <span class="sc">/</span> m) <span class="sc">*</span> alpha</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 4) pass or not ####</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>Pass <span class="ot">&lt;-</span> df<span class="sc">$</span>P_raw <span class="sc">&lt;=</span> df<span class="sc">$</span>BH_Threshold</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 5) padj ####</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>padj_calc <span class="ot">&lt;-</span> df<span class="sc">$</span>P_raw <span class="sc">*</span> (m <span class="sc">/</span> df<span class="sc">$</span>Rank)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>padj_calc <span class="ot">&lt;-</span> <span class="fu">pmin</span>(df<span class="sc">$</span>padj_calc, <span class="dv">1</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Cumulative Minimum from bottom</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>padj_final <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">cummin</span>(<span class="fu">rev</span>(df<span class="sc">$</span>padj_calc)))</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>df</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>R_function <span class="ot">&lt;-</span> <span class="fu">p.adjust</span>(df<span class="sc">$</span>P_raw, <span class="at">method=</span><span class="st">"BH"</span>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>df <span class="co">#%&gt;% select(Gene, P_raw, Rank, BH_Threshold, padj_final)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="independent-filtering-deseq2" class="level3">
+<h3 class="anchored" data-anchor-id="independent-filtering-deseq2">③ Independent Filtering (DESeq2)</h3>
+<ul>
+<li>problem: low count genes  hard to get statistical significance</li>
+<li>solution: pre-filtering of the low count genes –&gt; total tests n 🔽 –&gt; statistical power 🔼</li>
+<li>Cases where padj is NA in <code>DESeq2::results()</code>:
+<ol type="1">
+<li>Low-count gene (excluded by independent filtering)</li>
+<li>Outlier gene (based on Cook’s distance)</li>
+</ol></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_independent.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="392"></p>
+</figure>
+</div>
+</section>
+<section id="practice-deseq2results" class="level3">
+<h3 class="anchored" data-anchor-id="practice-deseq2results">④ Practice | DESeq2::results()</h3>
+<blockquote class="blockquote">
+<p>download practice data and save the following files in <code>data/</code> in your R project</p>
+</blockquote>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>2_1_dds_DESeq2.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1Q4HhyfdL9HmKyvwYuVxRrN8BvJYJaOFn/view?usp=drive_link">📥 Download</a></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 0. load DESeq data ####</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/2_1_dds_DESeq2.rds'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>design</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">$</span>condition</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extracting Results ####</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Contrast 사용 (분석 후 지정)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">results</span>(dds, <span class="at">contrast=</span><span class="fu">c</span>(<span class="st">"condition"</span>, <span class="st">"Tumor"</span>, <span class="st">"Normal"</span>))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 결과 구조 이해</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># | 열            | 의미                                   |</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># | baseMean      | 전체 샘플의 평균 발현량                |</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># | log2FoldChange| log2(Tumor / Normal) = LFC             |</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># | lfcSE         | LFC의 표준오차                         |</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># | stat          | Wald test statistic                    |</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># | pvalue        | 원래 p-value                           |</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># | padj          | FDR 보정된 p-value (adjusted p-value)  |</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co"># another option: Factor level 설정 (미리 설정)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>colData<span class="sc">$</span>condition</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>colData<span class="sc">$</span>condition <span class="ot">=</span> <span class="fu">relevel</span>(dds<span class="sc">@</span>colData<span class="sc">$</span>condition, <span class="at">ref=</span><span class="st">'Normal'</span>)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>colData<span class="sc">$</span>condition</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>dds<span class="sc">@</span>colData<span class="sc">$</span>condition <span class="ot">=</span> <span class="fu">relevel</span>(dds<span class="sc">@</span>colData<span class="sc">$</span>condition, <span class="at">ref=</span><span class="st">'Tumor'</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 1-2. Independent Filtering ####</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co"># x: Mean Normalized Counts, y: number of the significant</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">metadata</span>(res)<span class="sc">$</span>filterNumRej, </span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">type=</span><span class="st">"b"</span>, <span class="at">ylab=</span><span class="st">"Number of rejections"</span>, <span class="at">xlab=</span><span class="st">"Quantiles of filter"</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">metadata</span>(res)<span class="sc">$</span>lo.fit, <span class="at">col=</span><span class="st">"red"</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v=</span><span class="fu">metadata</span>(res)<span class="sc">$</span>filterTheta, <span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span>(<span class="st">"Independent Filtering Threshold Optimization"</span>)</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>res <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(padj) <span class="sc">%&gt;%</span> tail</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>res <span class="sc">%&gt;%</span> <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(padj)) <span class="sc">%&gt;%</span> dim</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="visualization-of-deg-results" class="level2">
+<h2 class="anchored" data-anchor-id="visualization-of-deg-results">2) Visualization of DEG Results</h2>
+<section id="ma-plot-global-view" class="level3">
+<h3 class="anchored" data-anchor-id="ma-plot-global-view">① MA Plot (Global View)</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_MA.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_MA_2.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>X-axis: Mean Average (A), Y-axis: Log Ratio (M = log₂FC)</li>
+<li>Check for data bias and LFC inflation in low-count genes</li>
+<li>Should be symmetric around Y=0</li>
+<li><code>apeglm::lfcShrink()</code>: controls LFC in low-count genes (recommended)</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">##| eval: false</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 2-1. MA plot ####</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># X축: Mean Expression (평균 발현량)</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Y축: Log2 Fold Change</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># → 전체 데이터의 분포와 bias 확인</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plotMA</span>(res, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>), <span class="at">main=</span><span class="st">"Before Shrinkage"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="do">### LFC Shrinkage to control low count genes ####</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">resultsNames</span>(dds)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>resLFC <span class="ot">&lt;-</span> <span class="fu">lfcShrink</span>(dds, <span class="at">coef=</span><span class="st">"condition_Tumor_vs_Normal"</span>, <span class="at">type=</span><span class="st">"apeglm"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(resLFC)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(resLFC, <span class="at">file=</span><span class="st">'data/3_dds_DESeq2_shr.rds'</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>res_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(resLFC) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"gene_id"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">is_significant =</span> padj <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span> <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># check the shrinkage effect</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="fu">plotMA</span>(res, <span class="at">main=</span><span class="st">"Before Shrinkage"</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>))</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="fu">plotMA</span>(resLFC, <span class="at">main=</span><span class="st">"After Shrinkage (Recommended)"</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>,<span class="dv">5</span>))</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="volcano-plot-selection" class="level3">
+<h3 class="anchored" data-anchor-id="volcano-plot-selection">② Volcano Plot (Selection)</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_vol.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<ul>
+<li>X-axis: log₂(Fold Change), Y-axis: −log₁₀(adjusted p-value)</li>
+<li>Identify genes with large |LFC| and low p-value</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">##| eval: false</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 2-2. volcano ####</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>p_thr<span class="ot">=</span><span class="fl">0.05</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>lfc_thr <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>vol_data <span class="ot">&lt;-</span> res_df <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diffexpressed =</span> <span class="fu">case_when</span>(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&gt;</span> lfc_thr <span class="sc">&amp;</span> padj <span class="sc">&lt;</span> p_thr <span class="sc">~</span> <span class="st">"UP"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&lt;</span> <span class="sc">-</span>lfc_thr <span class="sc">&amp;</span> padj <span class="sc">&lt;</span> p_thr <span class="sc">~</span> <span class="st">"DOWN"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"NO"</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vol_data)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vol_data, <span class="fu">aes</span>(<span class="at">x=</span>log2FoldChange, <span class="at">y=</span><span class="sc">-</span><span class="fu">log10</span>(padj), <span class="at">color=</span>diffexpressed)) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span><span class="fl">0.5</span>, <span class="at">size=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"DOWN"</span><span class="ot">=</span><span class="st">"steelblue"</span>, <span class="st">"NO"</span><span class="ot">=</span><span class="st">"grey"</span>, <span class="st">"UP"</span><span class="ot">=</span><span class="st">"indianred"</span>)) <span class="sc">+</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="fu">c</span>(<span class="sc">-</span>lfc_thr, lfc_thr), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="sc">-</span><span class="fu">log10</span>(p_thr), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># labeling the top 10</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="at">data=</span><span class="fu">head</span>(<span class="fu">arrange</span>(vol_data, padj), <span class="dv">10</span>), </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">aes</span>(<span class="at">label=</span>gene_id), <span class="at">color=</span><span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Volcano Plot"</span>, <span class="at">x=</span><span class="st">"Log2 Fold Change"</span>, <span class="at">y=</span><span class="st">"-Log10 Adjusted P-value"</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="do">## using lfc (recommended)</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>vol_data2 <span class="ot">&lt;-</span> resLFC <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">gene_id=</span><span class="fu">rownames</span>(.))  <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(padj) <span class="sc">%&gt;%</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diffexpressed =</span> <span class="fu">case_when</span>(</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&gt;</span> lfc_thr <span class="sc">&amp;</span> padj <span class="sc">&lt;</span> p_thr <span class="sc">~</span> <span class="st">"UP"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&lt;</span> <span class="sc">-</span>lfc_thr <span class="sc">&amp;</span> padj <span class="sc">&lt;</span> p_thr <span class="sc">~</span> <span class="st">"DOWN"</span>,</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"NO"</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vol_data2)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vol_data2, <span class="fu">aes</span>(<span class="at">x=</span>log2FoldChange, <span class="at">y=</span><span class="sc">-</span><span class="fu">log10</span>(padj), <span class="at">color=</span>diffexpressed)) <span class="sc">+</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha=</span><span class="fl">0.5</span>, <span class="at">size=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">"DOWN"</span><span class="ot">=</span><span class="st">"steelblue"</span>, <span class="st">"NO"</span><span class="ot">=</span><span class="st">"grey"</span>, <span class="st">"UP"</span><span class="ot">=</span><span class="st">"indianred"</span>)) <span class="sc">+</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept=</span><span class="fu">c</span>(<span class="sc">-</span>lfc_thr, lfc_thr), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept=</span><span class="sc">-</span><span class="fu">log10</span>(p_thr), <span class="at">linetype=</span><span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># labeling the top 10</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="at">data=</span><span class="fu">head</span>(<span class="fu">arrange</span>(vol_data2, padj), <span class="dv">10</span>), </span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">aes</span>(<span class="at">label=</span>gene_id), <span class="at">color=</span><span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"Volcano Plot (shr)"</span>, <span class="at">x=</span><span class="st">"Log2 Fold Change"</span>, <span class="at">y=</span><span class="st">"-Log10 Adjusted P-value"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="heatmap-pattern" class="level3">
+<h3 class="anchored" data-anchor-id="heatmap-pattern">③ Heatmap (Pattern)</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_heatmap.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<ul>
+<li>Visualize expression patterns of top significant genes</li>
+<li>Inspect patterns between Case/Control and identify outlier samples</li>
+<li>Apply <strong>vst/rlog transformation → z-score scaling</strong></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">##| eval: false</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 2-3. heatmap ####</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">### 1) vst matrix ####</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>vsd <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/1_3_vsd.rds'</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="do">### 2) top 20 ####</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>top_genes <span class="ot">&lt;-</span> res_df <span class="sc">%&gt;%</span> </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(padj <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(log2FoldChange))) <span class="sc">%&gt;%</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  .<span class="sc">$</span>gene_id</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(top_genes)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="do">### 3) vst matrix ####</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> <span class="fu">assay</span>(vsd)[top_genes, ]</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mat)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 4) annotations ####</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">colData</span>(dds)[,<span class="fu">c</span>(<span class="st">"gender"</span>,<span class="st">"condition"</span>)])</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Z-score scaling</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(mat, </span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">scale=</span><span class="st">"row"</span>,                    <span class="co"># z-score</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">show_rownames=</span><span class="cn">TRUE</span>,             <span class="co"># label gene names</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">show_colnames=</span><span class="cn">FALSE</span>,            <span class="co"># label sample names</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col=</span>df,              <span class="co"># sample annotation  </span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">cluster_cols =</span> <span class="cn">TRUE</span>,            <span class="co"># sample clustering</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Top 20 DEGs Heatmap"</span>    <span class="co"># plot title</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>         )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+</section>
+<section id="gsea" class="level1">
+<h1>4. GSEA</h1>
+<blockquote class="blockquote">
+<p>gene set enrichment analysis</p>
+</blockquote>
+<section id="functional-profiling" class="level2">
+<h2 class="anchored" data-anchor-id="functional-profiling">1) functional profiling</h2>
+<p>So far, we identified ~5,500 DEGs (Tumor vs.&nbsp;Normal) with FDR≤0.05 &amp; |LFC|≥1 … So What?</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W8_vol.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<p>–&gt; “Do they <u>functionally cluster</u> in specific biological processes?“ … <strong>Enrichment</strong></p>
+<ul>
+<li>Over-Representation Analysis (ORA)</li>
+<li><strong>Gene Set Enrichment Analysis (GSEA)</strong></li>
+</ul>
+</section>
+<section id="databases-gene-sets" class="level2">
+<h2 class="anchored" data-anchor-id="databases-gene-sets">2) databases (gene sets)</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Database</th>
+<th>Characteristics</th>
+<th>Typical Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://www.genome.jp/kegg/">KEGG</a></td>
+<td>Metabolic and disease pathways</td>
+<td>Metabolic disease, signaling cascades</td>
+</tr>
+<tr class="even">
+<td><a href="https://geneontology.org/">Gene Ontology(GO)</a></td>
+<td>Hierarchical gene function classification</td>
+<td>Most widely used across all fields</td>
+</tr>
+<tr class="odd">
+<td><a href="https://reactome.org/">Reactome</a></td>
+<td>Peer-reviewed, manually curated pathways</td>
+<td>Detailed biochemical mechanisms</td>
+</tr>
+<tr class="even">
+<td><a href="https://www.gsea-msigdb.org/gsea/msigdb">MSigDB</a> / <a href="https://maayanlab.cloud/Enrichr/#libraries"><strong>Enrichr</strong></a></td>
+<td>225+ diverse gene set collections</td>
+<td>Exploratory analyses</td>
+</tr>
+</tbody>
+</table>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/W9_enrichr.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="principle-of-gsea" class="level2">
+<h2 class="anchored" data-anchor-id="principle-of-gsea">3) principle of GSEA</h2>
+<section id="input" class="level3">
+<h3 class="anchored" data-anchor-id="input">① input</h3>
+<blockquote class="blockquote">
+<p>ranked genes + gene sets</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/ranked.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="measure-of-enrichment-score-es" class="level3">
+<h3 class="anchored" data-anchor-id="measure-of-enrichment-score-es">② measure of Enrichment Score (ES)</h3>
+<blockquote class="blockquote">
+<p>for each gene set</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/ES.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<p>patterns of ES</p>
+<p><img src="..\assets/img/postDEG/W10_pattern.png" class="img-fluid"></p>
+</section>
+<section id="how-to-get-significance" class="level3">
+<h3 class="anchored" data-anchor-id="how-to-get-significance">③ how to get significance</h3>
+<blockquote class="blockquote">
+<p>permutation</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/permut.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="practice-clusterprofiler" class="level2">
+<h2 class="anchored" data-anchor-id="practice-clusterprofiler">4) Practice | clusterProfiler</h2>
+<blockquote class="blockquote">
+<p>download practice data and save the following files in <code>data/</code> in your R project</p>
+</blockquote>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>4_1_res_DESeq2_with_entrez_and_rank.rds</code></td>
+<td><a href="https://drive.google.com/file/d/1A48HbcJHhQTEUDS-8Dp4iOCWCWMDx-L0/view?usp=drive_link">📥 Download</a></td>
+</tr>
+</tbody>
+</table>
+<section id="pre-processing" class="level3">
+<h3 class="anchored" data-anchor-id="pre-processing">① pre-processing</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. load results (with entrez_id) ####</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>res_df <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/4_1_res_DESeq2_with_entrez_and_rank.rds'</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res_df)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1-1. input: ranked gene list ####</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(res_df<span class="sc">$</span>rank_lfc, res_df<span class="sc">$</span>rank_pi)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(res_df<span class="sc">$</span>rank_lfc, res_df<span class="sc">$</span>rank_wald)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(res_df<span class="sc">$</span>rank_pi, res_df<span class="sc">$</span>rank_wald)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="do">### (optional) removing duplicates</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(res_df)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>res_df <span class="ot">&lt;-</span> res_df <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(entrez, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(entrez))</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(res_df)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 1-2. ranked gene list ####</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>geneList <span class="ot">&lt;-</span> res_df<span class="sc">$</span>rank_wald</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(geneList) <span class="ot">&lt;-</span> res_df<span class="sc">$</span>entrez </span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>geneList <span class="ot">&lt;-</span> <span class="fu">sort</span>(geneList, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(geneList) <span class="co"># top up-regulated</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(geneList) <span class="co"># top down-regulated</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(geneList) <span class="ot">&lt;-</span> res_df<span class="sc">$</span>gene </span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>geneList <span class="ot">&lt;-</span> <span class="fu">sort</span>(geneList, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(geneList) <span class="co"># top up-regulated</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(geneList) <span class="co"># top down-regulated</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="gsea-1" class="level3">
+<h3 class="anchored" data-anchor-id="gsea-1">② GSEA</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. GSEA ####</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Gene ontology (GO) ####</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>gsea_res <span class="ot">&lt;-</span> <span class="fu">gseGO</span>(<span class="at">geneList =</span> geneList,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">OrgDb        =</span> org.Hs.eg.db,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keyType =</span> <span class="st">"SYMBOL"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ont          =</span> <span class="st">"BP"</span>,            </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">minGSSize    =</span> <span class="dv">10</span>,              <span class="co"># excluding too small pathways</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">maxGSSize    =</span> <span class="dv">500</span>,             <span class="co"># excluding too large pathways</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">pvalueCutoff =</span> <span class="dv">1</span>,               <span class="co"># pvalue cutoff to show terms</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">by =</span> <span class="st">"fgsea"</span> )                  <span class="co"># fgsea: pvalues by tail approximate (fast), DOSE: permutation</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gsea_res)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(gsea_res)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(gsea_res,<span class="st">'data/4_2_gsea_GO.rds'</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="do">## REACTOME ####</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>gsea_res <span class="ot">&lt;-</span> <span class="fu">gsePathway</span>(geneList, </span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">pvalueCutoff =</span> <span class="dv">1</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gsea_res)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(gsea_res,<span class="st">'data/4_2_gsea_RE.rds'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="visualization" class="level3">
+<h3 class="anchored" data-anchor-id="visualization">③ visualization</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. visualization ####</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>gsea_res <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">'data/4_2_gsea_GO.rds'</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 3-1. Dot Plot (summary) ####</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># x: GeneRatio, dot size: Gene Count, color: p.adjust</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dotplot</span>(gsea_res, <span class="at">showCategory =</span> <span class="dv">5</span>, <span class="at">split =</span> <span class="st">".sign"</span>) <span class="sc">+</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"GO BP Enrichment"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dotplot</span>(gsea_res, <span class="at">showCategory =</span> <span class="dv">5</span>, <span class="at">split =</span> <span class="st">".sign"</span>) <span class="sc">+</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>.sign) <span class="sc">+</span> <span class="co"># Up/Down Pathway </span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"GO BP Enrichment (split)"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 3-2. GSEA Enrichment Plot (for the specific pathway) ####</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">gseaplot2</span>(gsea_res, <span class="at">geneSetID =</span> <span class="dv">1</span>, <span class="at">title =</span> gsea_res<span class="sc">$</span>Description[<span class="dv">1</span>])</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p1)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="do">### multiple (Top 3)</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">gseaplot2</span>(gsea_res, <span class="at">geneSetID =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(p2)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 3-3. Ridge Plot (expression level), requring ggridges</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ridgeplot</span>(gsea_res, <span class="at">showCategory =</span> <span class="dv">5</span>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Enrichment Distribution"</span>)</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 3-4. Network plot</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="fu">cnetplot</span>(gsea_res, <span class="at">foldChange=</span>geneList)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/GSEA.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+</section>
+<section id="exploring-anything-of-interest" class="level3">
+<h3 class="anchored" data-anchor-id="exploring-anything-of-interest">④ exploring anything of interest</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Core Enrichment Genes ####</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>gsea_res_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(gsea_res)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(gsea_res_df)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># save the result</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(gsea_res_df, <span class="st">"data/4_2_gsea_GO_results.csv"</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># show core genes for a pathway</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>core_genes <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(gsea_res_df<span class="sc">$</span>core_enrichment[<span class="dv">1</span>], <span class="st">"/"</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(core_genes)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. 자유 탐색 아이디어: 관심 유전자 탐색 ####</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 특정 유전자가 종양에서 어떻게 변하는지 확인</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>my_gene <span class="ot">&lt;-</span> <span class="st">"EGFR"</span>  <span class="co"># 원하는 유전자로 바꿔보세요</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>my_gene <span class="ot">&lt;-</span> <span class="st">"ARHGAP44"</span>  <span class="co"># 원하는 유전자로 바꿔보세요</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 발현량 시각화</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">plotCounts</span>(dds, <span class="at">gene =</span> my_gene, <span class="at">intgroup =</span> <span class="st">"condition"</span>, <span class="at">returnData =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co"># 더 예쁘게</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> <span class="fu">plotCounts</span>(dds, <span class="at">gene =</span> my_gene, <span class="at">intgroup =</span> <span class="st">"condition"</span>, <span class="at">returnData =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>plot_data<span class="sc">$</span>count <span class="sc">%&gt;%</span> head</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>plot_data<span class="sc">$</span>count <span class="sc">%&gt;%</span> max</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="fu">counts</span>(dds,<span class="at">normalized=</span>T)[my_gene,] <span class="sc">%&gt;%</span> max</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="fu">log2</span>(<span class="fu">counts</span>(dds,<span class="at">normalized=</span>T)[my_gene,] <span class="sc">%&gt;%</span> max)</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> condition, <span class="at">y =</span> <span class="fu">log2</span>(count<span class="sc">+</span><span class="dv">1</span>), <span class="at">fill =</span> condition)) <span class="sc">+</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(my_gene, <span class="st">" Expression"</span>),</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"log2(Normalized Counts)"</span>) <span class="sc">+</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/postDEG/box.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+</section>
+<section id="전체-분석-파이프라인" class="level1">
+<h1>전체 분석 파이프라인</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="..\assets/img/summary.png" class="img-fluid quarto-figure quarto-figure-center figure-img"></p>
+</figure>
+</div>
+<hr>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">➕ references</h2>
+<section id="eda-transformation" class="level3">
+<h3 class="anchored" data-anchor-id="eda-transformation">EDA &amp; Transformation</h3>
+<p><a href="https://doi.org/10.1186/gb-2010-11-10-r106">vst / rlog: Anders &amp; Huber, Genome Biology 2010</a><br>
+<a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#data-transformations-and-visualization">DESeq2 Vignette — Data transformations</a><br>
+<a href="https://www.youtube.com/watch?v=FgakZw6K1QQ">StatQuest: PCA step-by-step</a></p>
+</section>
+<section id="deseq2" class="level3">
+<h3 class="anchored" data-anchor-id="deseq2">DESeq2</h3>
+<p><a href="https://doi.org/10.1186/s13059-014-0550-8">DESeq2: Love, Huber &amp; Anders, Genome Biology 2014</a><br>
+<a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">DESeq2 Vignette (Bioconductor)</a><br>
+<a href="https://doi.org/10.12688/f1000research.7035.2">RNA-seq workflow: gene-level EDA &amp; DEG (F1000Research)</a><br>
+<a href="https://doi.org/10.1093/bioinformatics/bty895">LFC shrinkage — apeglm: Zhu, Ibrahim &amp; Love, Bioinformatics 2019</a><br>
+<a href="https://doi.org/10.12688/f1000research.27893.1">Design matrix guide: Law et al., F1000Research 2020</a></p>
+</section>
+<section id="multiple-testing" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-testing">Multiple Testing</h3>
+<p><a href="https://doi.org/10.1111/j.2517-6161.1995.tb02031.x">BH procedure: Benjamini &amp; Hochberg, JRSS-B 1995</a><br>
+<a href="https://doi.org/10.1073/pnas.0914005107">Independent filtering: Bourgon, Gentleman &amp; Huber, PNAS 2010</a><br>
+<a href="https://www.youtube.com/watch?v=K8LQSvtjcEo">StatQuest: FDR and multiple testing</a></p>
+</section>
+<section id="visualization-1" class="level3">
+<h3 class="anchored" data-anchor-id="visualization-1">Visualization</h3>
+<p><a href="https://bioconductor.org/packages/release/bioc/vignettes/EnhancedVolcano/inst/doc/EnhancedVolcano.html">EnhancedVolcano (Bioconductor)</a><br>
+<a href="https://doi.org/10.1093/bioinformatics/btw313">ComplexHeatmap: Gu et al., Bioinformatics 2016</a><br>
+<a href="https://jokergoo.github.io/ComplexHeatmap-reference/book/">ComplexHeatmap Complete Reference</a></p>
+</section>
+<section id="gsea-2" class="level3">
+<h3 class="anchored" data-anchor-id="gsea-2">GSEA</h3>
+<p><a href="https://doi.org/10.1073/pnas.0506580102">GSEA: Subramanian et al., PNAS 2005</a><br>
+<a href="https://doi.org/10.1038/ng1180">Mootha et al., Nature Genetics 2003</a><br>
+<a href="https://doi.org/10.1016/j.xinn.2021.100141">clusterProfiler 4.0: Wu et al., The Innovation 2021</a><br>
+<a href="https://yulab-smu.top/biomedical-knowledge-mining-book/">clusterProfiler Book (Yu Lab)</a><br>
+<a href="https://www.gsea-msigdb.org/gsea/msigdb">MSigDB</a><br>
+<a href="https://geneontology.org/">Gene Ontology</a><br>
+<a href="https://reactome.org/">Reactome</a></p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<!-- AI Chat Widget 초기화 -->
+
+<!-- _quarto.yml의 include-after-body에 등록되어 모든 페이지에 자동 삽입됩니다 -->
+
+<script>
+
+  // ★ Cloudflare Worker 배포 후 URL로 교체하세요
+
+  const WORKER_URL = "https://falling-wave-447f.eh0129s.workers.dev/";
+
+
+
+  // 각 .qmd 파일의 YAML에서 ai-context를 읽어옵니다
+
+  // (없으면 빈 문자열 → 기본 안내 메시지)
+
+  const metaContext = document.querySelector('meta[name="ai-context"]');
+
+  const metaTitle   = document.querySelector('meta[name="ai-title"]') || { content: document.title };
+
+
+
+  window.AI_CHAT_CONFIG = {
+
+    workerUrl:      WORKER_URL,
+
+    chapterContext: metaContext ? metaContext.content : "",
+
+    chapterTitle:   metaTitle  ? metaTitle.content   : document.title,
+
+  };
+
+</script>
+
+<!-- 위젯 코드를 인라인으로 삽입 (외부 src 제거 → 페이지 깊이에 따른 경로 404 방지) -->
+
+<script>
+
+/**
+
+ * AI Chat Widget for Quarto
+
+ * 각 페이지의 YAML front matter에서 시스템 프롬프트를 읽어옵니다.
+
+ * window.AI_CHAT_CONFIG 에서 설정을 가져옵니다.
+
+ */
+
+
+
+(function () {
+
+  const cfg = window.AI_CHAT_CONFIG || {};
+
+  const WORKER_URL = cfg.workerUrl || "";
+
+  const CHAPTER_CONTEXT = cfg.chapterContext || "";
+
+  const CHAPTER_TITLE = cfg.chapterTitle || document.title;
+
+
+
+  if (!WORKER_URL) {
+
+    console.warn("[AI Chat] workerUrl이 설정되지 않았습니다.");
+
+    return;
+
+  }
+
+
+
+  /* ── 시스템 프롬프트 ───────────────────────── */
+
+  const SYSTEM_PROMPT = `당신은 "${CHAPTER_TITLE}" 강의자료를 도와주는 학습 도우미입니다.
+
+
+
+아래는 현재 챕터의 핵심 내용입니다:
+
+---
+
+${CHAPTER_CONTEXT}
+
+---
+
+
+
+규칙:
+
+- 위 챕터 내용을 중심으로 답변하세요.
+
+- 질문이 챕터 범위를 벗어나면 간단히 언급하고 챕터 내용으로 연결해주세요.
+
+- R 코드 예시가 도움이 될 때는 포함하세요.
+
+- 한국어로 답변하되, 전문 용어는 영어 병기 가능합니다.
+
+- 의학/과학 학생 대상이므로 정확성을 최우선으로 합니다.`;
+
+
+
+  /* ── DOM 생성 ────────────────────────────── */
+
+  const style = document.createElement("style");
+
+  style.textContent = `
+
+    #ai-chat-fab {
+
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+
+      width: 52px; height: 52px; border-radius: 50%;
+
+      background: #1a6e3c; color: #fff; border: none;
+
+      box-shadow: 0 4px 16px rgba(0,0,0,.22);
+
+      cursor: pointer; font-size: 22px;
+
+      display: flex; align-items: center; justify-content: center;
+
+      transition: background .2s, transform .15s;
+
+    }
+
+    #ai-chat-fab:hover { background: #155730; transform: scale(1.07); }
+
+
+
+    #ai-chat-panel {
+
+      position: fixed; bottom: 90px; right: 28px; z-index: 9998;
+
+      width: 360px; max-width: calc(100vw - 40px);
+
+      height: 500px; max-height: calc(100vh - 120px);
+
+      background: #fff; border-radius: 16px;
+
+      box-shadow: 0 8px 40px rgba(0,0,0,.18);
+
+      display: flex; flex-direction: column;
+
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+
+      overflow: hidden;
+
+      transform: scale(.92) translateY(12px);
+
+      opacity: 0; pointer-events: none;
+
+      transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .18s;
+
+    }
+
+    #ai-chat-panel.open {
+
+      transform: scale(1) translateY(0);
+
+      opacity: 1; pointer-events: all;
+
+    }
+
+
+
+    #ai-chat-header {
+
+      background: #1a6e3c; color: #fff;
+
+      padding: 14px 16px 12px;
+
+      display: flex; align-items: center; gap: 10px;
+
+      font-size: 14px; font-weight: 600; letter-spacing: .01em;
+
+      flex-shrink: 0;
+
+    }
+
+    #ai-chat-header span { flex: 1; }
+
+    #ai-chat-close {
+
+      background: none; border: none; color: #fff;
+
+      font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
+
+      opacity: .8;
+
+    }
+
+    #ai-chat-close:hover { opacity: 1; }
+
+
+
+    #ai-chat-subtitle {
+
+      font-size: 11px; color: rgba(255,255,255,.72);
+
+      font-weight: 400; display: block; margin-top: 2px;
+
+    }
+
+
+
+    #ai-chat-messages {
+
+      flex: 1; overflow-y: auto; padding: 14px 14px 8px;
+
+      display: flex; flex-direction: column; gap: 10px;
+
+      scroll-behavior: smooth;
+
+    }
+
+    #ai-chat-messages::-webkit-scrollbar { width: 4px; }
+
+    #ai-chat-messages::-webkit-scrollbar-thumb {
+
+      background: #ddd; border-radius: 4px;
+
+    }
+
+
+
+    .ai-msg {
+
+      max-width: 88%; padding: 9px 13px;
+
+      border-radius: 14px; font-size: 13.5px; line-height: 1.55;
+
+      white-space: pre-wrap; word-break: break-word;
+
+    }
+
+    .ai-msg.user {
+
+      align-self: flex-end;
+
+      background: #1a6e3c; color: #fff;
+
+      border-bottom-right-radius: 4px;
+
+    }
+
+    .ai-msg.assistant {
+
+      align-self: flex-start;
+
+      background: #f3f4f6; color: #1f2937;
+
+      border-bottom-left-radius: 4px;
+
+    }
+
+    .ai-msg.assistant code {
+
+      background: #e5e7eb; padding: 1px 5px;
+
+      border-radius: 4px; font-size: 12.5px; font-family: monospace;
+
+    }
+
+    .ai-msg.assistant pre {
+
+      background: #1f2937; color: #f9fafb;
+
+      padding: 10px 12px; border-radius: 8px; overflow-x: auto;
+
+      font-size: 12px; margin: 6px 0;
+
+    }
+
+    .ai-msg.assistant pre code { background: none; padding: 0; color: inherit; }
+
+
+
+    .ai-typing {
+
+      align-self: flex-start;
+
+      display: flex; gap: 5px; padding: 10px 14px;
+
+      background: #f3f4f6; border-radius: 14px; border-bottom-left-radius: 4px;
+
+    }
+
+    .ai-typing span {
+
+      width: 7px; height: 7px; background: #9ca3af;
+
+      border-radius: 50%; animation: aiDot 1.2s infinite;
+
+    }
+
+    .ai-typing span:nth-child(2) { animation-delay: .2s; }
+
+    .ai-typing span:nth-child(3) { animation-delay: .4s; }
+
+    @keyframes aiDot {
+
+      0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+
+      30% { transform: translateY(-5px); opacity: 1; }
+
+    }
+
+
+
+    #ai-chat-input-row {
+
+      display: flex; gap: 8px; padding: 10px 12px 12px;
+
+      border-top: 1px solid #f0f0f0; flex-shrink: 0;
+
+    }
+
+    #ai-chat-input {
+
+      flex: 1; border: 1px solid #e5e7eb; border-radius: 10px;
+
+      padding: 8px 12px; font-size: 13.5px; resize: none;
+
+      font-family: inherit; outline: none; max-height: 100px;
+
+      line-height: 1.45; color: #1f2937;
+
+      transition: border-color .15s;
+
+    }
+
+    #ai-chat-input:focus { border-color: #1a6e3c; }
+
+    #ai-chat-send {
+
+      width: 36px; height: 36px; border-radius: 9px;
+
+      background: #1a6e3c; color: #fff; border: none;
+
+      cursor: pointer; font-size: 16px; flex-shrink: 0;
+
+      align-self: flex-end;
+
+      display: flex; align-items: center; justify-content: center;
+
+      transition: background .15s;
+
+    }
+
+    #ai-chat-send:hover { background: #155730; }
+
+    #ai-chat-send:disabled { background: #9ca3af; cursor: not-allowed; }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+
+  document.body.insertAdjacentHTML("beforeend", `
+
+    <button id="ai-chat-fab" title="AI 학습 도우미">💬</button>
+
+    <div id="ai-chat-panel">
+
+      <div id="ai-chat-header">
+
+        <div>
+
+          <span>AI 학습 도우미</span>
+
+          <small id="ai-chat-subtitle">${CHAPTER_TITLE}</small>
+
+        </div>
+
+        <button id="ai-chat-close">✕</button>
+
+      </div>
+
+      <div id="ai-chat-messages">
+
+        <div class="ai-msg assistant">안녕하세요! 이 챕터에 대해 궁금한 점을 물어보세요 😊</div>
+
+      </div>
+
+      <div id="ai-chat-input-row">
+
+        <textarea id="ai-chat-input" placeholder="질문을 입력하세요… (Shift+Enter: 줄바꿈)" rows="1"></textarea>
+
+        <button id="ai-chat-send">➤</button>
+
+      </div>
+
+    </div>
+
+  `);
+
+
+
+  /* ── 상태 ─────────────────────────────────── */
+
+  const panel = document.getElementById("ai-chat-panel");
+
+  const fab = document.getElementById("ai-chat-fab");
+
+  const closeBtn = document.getElementById("ai-chat-close");
+
+  const input = document.getElementById("ai-chat-input");
+
+  const sendBtn = document.getElementById("ai-chat-send");
+
+  const messages = document.getElementById("ai-chat-messages");
+
+  const history = []; // {role, content}[]
+
+
+
+  /* ── 토글 ─────────────────────────────────── */
+
+  fab.addEventListener("click", () => {
+
+    panel.classList.toggle("open");
+
+    if (panel.classList.contains("open")) input.focus();
+
+  });
+
+  closeBtn.addEventListener("click", () => panel.classList.remove("open"));
+
+
+
+  /* ── 자동 높이 조정 ───────────────────────── */
+
+  input.addEventListener("input", () => {
+
+    input.style.height = "auto";
+
+    input.style.height = Math.min(input.scrollHeight, 100) + "px";
+
+  });
+
+
+
+  /* ── 전송 ─────────────────────────────────── */
+
+  input.addEventListener("keydown", (e) => {
+
+    if (e.key === "Enter" && !e.shiftKey) {
+
+      e.preventDefault();
+
+      sendMessage();
+
+    }
+
+  });
+
+  sendBtn.addEventListener("click", sendMessage);
+
+
+
+  function appendMsg(role, text) {
+
+    const div = document.createElement("div");
+
+    div.className = `ai-msg ${role}`;
+
+    // 간단한 코드블록 렌더링
+
+    div.innerHTML = text
+
+      .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
+
+        `<pre><code>${escHtml(code.trim())}</code></pre>`
+
+      )
+
+      .replace(/`([^`]+)`/g, (_, c) => `<code>${escHtml(c)}</code>`)
+
+      .replace(/\n/g, "<br>");
+
+    messages.appendChild(div);
+
+    messages.scrollTop = messages.scrollHeight;
+
+    return div;
+
+  }
+
+
+
+  function escHtml(s) {
+
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  }
+
+
+
+  function showTyping() {
+
+    const el = document.createElement("div");
+
+    el.className = "ai-typing";
+
+    el.innerHTML = "<span></span><span></span><span></span>";
+
+    messages.appendChild(el);
+
+    messages.scrollTop = messages.scrollHeight;
+
+    return el;
+
+  }
+
+
+
+  async function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (!text || sendBtn.disabled) return;
+
+
+
+    input.value = "";
+
+    input.style.height = "auto";
+
+    sendBtn.disabled = true;
+
+
+
+    appendMsg("user", text);
+
+    history.push({ role: "user", content: text });
+
+
+
+    const typing = showTyping();
+
+
+
+    try {
+
+      const res = await fetch(WORKER_URL, {
+
+        method: "POST",
+
+        headers: { "Content-Type": "application/json" },
+
+        body: JSON.stringify({
+
+          model: "claude-sonnet-4-6",
+
+          max_tokens: 1024,
+
+          system: SYSTEM_PROMPT,
+
+          messages: history,
+
+        }),
+
+      });
+
+
+
+      const data = await res.json();
+
+      typing.remove();
+
+
+
+      if (data.content && data.content[0]) {
+
+        const reply = data.content[0].text;
+
+        appendMsg("assistant", reply);
+
+        history.push({ role: "assistant", content: reply });
+
+      } else {
+
+        appendMsg("assistant", "오류가 발생했습니다. 다시 시도해주세요.");
+
+      }
+
+    } catch (err) {
+
+      typing.remove();
+
+      appendMsg("assistant", "네트워크 오류가 발생했습니다.");
+
+      console.error("[AI Chat]", err);
+
+    }
+
+
+
+    sendBtn.disabled = false;
+
+    input.focus();
+
+  }
+
+})();
+
+</script>
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright 2026, Eunji</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
