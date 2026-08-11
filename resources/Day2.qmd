@@ -229,7 +229,7 @@ ggplot(df_count, aes(x = mean, y = sd)) +
 
 ------------------------------------------------------------------------
 
-# 3) Visual Exploration
+## 3) Visual Exploration
 
 What to check through visualization:
 
@@ -241,7 +241,7 @@ What to check through visualization:
 
 ------------------------------------------------------------------------
 
-## PCA
+### PCA
 
 > principal component analysis
 

@@ -215,5 +215,12 @@
     "title": "오믹스 데이터 분석 기술",
     "section": "",
     "text": "Course Overview"
+  },
+  {
+    "objectID": "resources/Day2.html#visual-exploration",
+    "href": "resources/Day2.html#visual-exploration",
+    "title": "오믹스 데이터 분석 기술 Day 1",
+    "section": "3) Visual Exploration",
+    "text": "3) Visual Exploration\nWhat to check through visualization:\n\nIs there a difference between groups?\nAre there any outlier samples?\nIs there a batch effect?\n\n\n\n\n\n\n\n\nPCA\n\nprincipal component analysis\n\n\n\n\n\n\n\n## 5-1. PCA plot ####\npca_res &lt;- prcomp(t(vsd_data))\npca_res$x %&gt;% head\n\n# PC1 and PC2\npca_coords &lt;- as.data.frame(pca_res$x)[,1:2]\npca_coords %&gt;% head\n\nggplot(pca_coords, aes(x=PC1, y=PC2)) + \n  geom_point(size=3) + ggtitle(\"PCA Result\") + theme_bw()\n\n\n## 5-2. using DESeq2 function (using top 100) ####\nplotPCA(vsd, intgroup = \"condition\") +\n  theme_classic() +\n  labs(title = \"PCA Plot\")\n\nplotPCA(vsd, ntop=nrow(vsd), intgroup = \"condition\") +\n  theme_classic() +\n  labs(title = \"PCA Plot\")"
   }
 ]
