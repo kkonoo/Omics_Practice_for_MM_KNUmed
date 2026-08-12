@@ -1,5 +1,5 @@
 ---
-title: "오믹스 데이터 분석 기술 Day 1"
+title: "오믹스 데이터 분석 기술 Day 2"
 subtitle: "의학과 4학년 1학기 - 분자의학 선택연구"
 author: "하은지 (분자의학교실)"
 date: last-modified
@@ -387,7 +387,7 @@ $$ design = ~ Batch + Confounders + Condition $$
 ### Design Matrix (Advanced)
 
 | Analysis Type | Clinical Scenario | Design Formula |
-|----------------|-----------------------------|--------------------------|
+|------------------|-----------------------------|--------------------------|
 | Paired sample | Tumor vs. Normal, Pre vs. Post | `~ Patient + Treatment` |
 | Interaction Term | Drug response × disease subgroup | `~ Disease + Drug + Disease:Drug` |
 | Time-Series | Multiple time points | `~ Time` (use LRT) |
@@ -761,7 +761,7 @@ patterns of ES
 > download practice data and save the following files in `data/` in your R project
 
 | File | Link |
-|------------------------------------------------|------------------------|
+|------------------------------------------------|-------------------------|
 | `4_1_res_DESeq2_with_entrez_and_rank.rds` | [📥 Download](https://drive.google.com/file/d/1A48HbcJHhQTEUDS-8Dp4iOCWCWMDx-L0/view?usp=drive_link) |
 
 ### ① pre-processing
